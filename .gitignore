@@ -149,3 +149,4 @@ static/
 .vscode/
 *.code-workspace
 Makefile
+__*
