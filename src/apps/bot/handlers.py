@@ -1,14 +1,16 @@
-import json
+# import json
+from typing import List, Optional
 
 from telegram import (
-    InlineKeyboardButton,
     InlineKeyboardMarkup,
     KeyboardButton,
     ReplyKeyboardMarkup,
-    ReplyKeyboardRemove,
+    # ReplyKeyboardRemove,
     Update,
     WebAppInfo,
 )
+
+
 from telegram.ext import (
     CallbackQueryHandler,
     CommandHandler,
@@ -18,105 +20,169 @@ from telegram.ext import (
     filters,
 )
 
-AGE = "age"
-LOCATION = "location"
-COUNTRY = "country"
-REGION = "region"
-CITY = "city"
-FUND = "fund"
-NEW_FUND = "new_fund"
-NAME = "name"
-URL = "URL"
+from . import bot_settings as s
+
+from .utils import (
+    add_if_unique,
+    get_keyboard,
+    get_text,
+    is_back,
+    is_city_requested,
+    is_fund_requested,
+    markup_OK,
+)
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+cbq = s.CallbackQueries
+__stack: List = []
+
+
+# to make bot_send_message
+async def message(update: Update, text: str, reply=None):
+    await update.message.reply_html(text, reply_markup=reply)
+
+
+# to make as decorator later
+async def bot_send_data(
+    update: Update,
+    text: str,
+    keyboard: Optional[InlineKeyboardMarkup] = None,
+    stack: bool = True,
+) -> None:
+    if update.message:
+        await update.message.reply_html(text, reply_markup=keyboard)
+    else:
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text(
+            text, reply_markup=keyboard)
+    if stack:
+        add_if_unique(__stack, text, keyboard)
+
+
+async def bot_say_by(update: Update, text: str) -> int:
+    await message(update, text)
+    return ConversationHandler.END
+
+
+# 1: GREETINGS ==================================================================================================================
+async def greetings(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data[s.COUNTRY] = "Россия"
+    s.USERNAME = update.message.from_user.first_name
     await update.message.reply_html(
-        text=(
-            "Привет! Я бот проекта ЗНАЧИМ. Я помогу тебе встать на путь "
-            "наставничества - стать настоящим другом для подростка, которому "
-            "нужна помощь.\n\n"
-            "Сначала я помогу тебе выбрать фонд, а затем заполнить небольшую "
-            "анкету."
-        ),
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Понятно", callback_data="age")]]),
-    )
-    return AGE
+        text=get_text(s.GREETING), reply_markup=markup_OK(cbq.GET_AGE))
+    return s.MAIN_CONVERSATION
 
 
-async def age(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.answer()
-    await update.callback_query.edit_message_text("Сколько тебе лет?")
-    return AGE
+# 2: AGE ==================================================================================================================
+async def get_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await bot_send_data(update, get_text(s.WHAT_AGE), stack=False)
 
 
 async def check_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if int(update.message.text) < 18:
-        await update.message.reply_html(
-            "Извини, но стать наставником ты сможешь только, когда тебе "
-            "исполнится 18. А пока, я уверен, ты сможешь найти себя в другом "
-            "волонтерском проекте)"
-        )
-        return ConversationHandler.END
+    age = int(update.message.text)
+    if s.AGE_LIMIT < age:
+        context.user_data[s.AGE] = age
+        await get_location(update, context)
     else:
-        context.user_data[AGE] = update.message.text
-        return await location(update, context)
+        await bot_say_by(update, get_text(s.REFUSAL))
 
 
-async def location(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    from .models import CoverageArea
+# 3: LOCATION ==================================================================================================================
+async def go_back(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if len(__stack) > 1:
+        __stack.pop()
+        await bot_send_data(update, **__stack.pop(), stack=False)
+    else:
+        await get_location(update, context)
 
-    if COUNTRY in context.user_data:
-        del context.user_data[COUNTRY]
-    if REGION in context.user_data:
-        del context.user_data[REGION]
-    if CITY in context.user_data:
-        del context.user_data[CITY]
-    if FUND in context.user_data:
-        del context.user_data[FUND]
-    text = "В каком ты городе?"
-    regions_buttons = [
-        [InlineKeyboardButton(region.name, callback_data=region.name)]
-        async for region in CoverageArea.objects.filter(level=1)
+
+async def get_country(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = s.CHOOSE_COUNTRY
+    buttons = [
+        ("Казахстан", cbq.GET_FUND),
+        ("Другая страна", cbq.NO_FUND),
     ]
-    regions_buttons.extend(
-        (
-            [InlineKeyboardButton("Другой город", callback_data="other_city")],
-            [InlineKeyboardButton("Я не в России", callback_data="other_country")],
-        )
-    )
-    keyboard = InlineKeyboardMarkup(regions_buttons)
-    if update.message:
-        await update.message.reply_html(text=text, reply_markup=keyboard)
-    else:
-        await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
-    return LOCATION
+    keyboard = get_keyboard(buttons, footer=cbq.LONG_BACK_BUTTON)
+    await bot_send_data(update, text, keyboard)
 
 
-async def check_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data[COUNTRY] = "Россия"
-    if update.callback_query.data == "Москва":
-        context.user_data[REGION] = "Московская область"
-        context.user_data[CITY] = update.callback_query.data
-        return await fund(update, context)
-    if update.callback_query.data == "Санкт-Петербург":
-        context.user_data[REGION] = update.callback_query.data
-        context.user_data[CITY] = update.callback_query.data
-        return await fund(update, context)
-    else:
-        context.user_data[REGION] = update.callback_query.data
-        return await city(update, context)
+async def get_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    __stack.clear()
+    text = get_text(s.WHAT_LOCATION)
+    buttons = [
+        (s.MSK, cbq.GET_FUND + s.MSK),
+        (s.SPB, cbq.GET_FUND + s.SPB),
+        (s.MSK_reg, cbq.GET_CITY + s.MSK_reg),
+        (cbq.BUTTON_OTHER_REGION),
+        (cbq.BUTTON_OTHER_COUNTRY),
+    ]
+    keyboard = get_keyboard(buttons)
+    await bot_send_data(update, text, keyboard)
+    return s.MAIN_CONVERSATION
+
+
+async def get_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    from .models import CoverageArea
+    text = s.CHOOSE_REGION
+    buttons = [
+        (region.name, cbq.GET_CITY + region.name)
+        async for region in
+        CoverageArea.objects.filter(level=1)
+        if region.name not in s.TWO_CAPITALS]
+    footer = (
+        (cbq.NO_MY_REGION_TEXT, cbq.NO_FUND),
+        cbq.LONG_BACK_BUTTON)
+    keyboard = get_keyboard(buttons, footer=footer)
+    await bot_send_data(update, text, keyboard)
+
+
+def set_location(
+    data: str, prefix: str, location_name: str,
+    context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    context.user_data[location_name] = data.replace(prefix, "")
+
+
+async def get_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    set_location(update.callback_query.data, cbq.GET_CITY, s.REGION, context)
+    from .models import CoverageArea
+    text = s.CHOOSE_CITY
+    buttons = [
+        (city.name, cbq.GET_FUND + city.name)
+        async for city in
+        CoverageArea.objects.filter(parent__name=context.user_data[s.REGION])]
+    footer = (
+        (cbq.NO_MY_CITY_TEXT, cbq.NO_FUND),
+        cbq.LONG_BACK_BUTTON)
+    keyboard = get_keyboard(buttons, footer=footer)
+    await bot_send_data(update, text, keyboard)
+
+
+# 4: FUNDS ==================================================================================================================
+async def get_fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    set_location(update.callback_query.data, cbq.GET_FUND, s.CITY, context)
+    # from .models import CoverageArea, Fund
+    text = s.CHOOSE_FUND
+    buttons = [
+        (cbq.FUNDS_INFO_TEXT, cbq.GET_FUNDS_INFO),
+        ("1 Арифметика добра", "Арифметика добра"),
+        ("2 Арифметика добра", "Арифметика добра"),
+        ("3 Арифметика добра", "Арифметика добра"),
+    ]
+    keyboard = get_keyboard(buttons, footer=cbq.LONG_BACK_BUTTON)
+    await bot_send_data(update, text, keyboard)
+
+
+async def get_funds_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = s.FUNDS_DESCRIPTION
+    keyboard = markup_OK(cbq.GET_FUND)
+    await bot_send_data(update, text, keyboard, stack=False)
 
 
 async def no_fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.answer()
-    await update.callback_query.edit_message_text(
-        "Извини, на данный момент проект не реализуется в твоем городе, но "
-        "мы планируем развиваться! Напиши нам если знаешь благотворительный "
-        "фонд, который занимается помощью детям-сиротам и детям, оставшимся "
-        "без попечения родителей, чтобы мы запустили проект в твоем городе.",
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Да, давай", callback_data="new_fund_form")]]),
-    )
-    return NEW_FUND
+    text = s.NO_FUND_MESSAGE.format(s.USERNAME)
+    keyboard = get_keyboard([(s.NEW_FUND_CONFIRM_MESSAGE, s.NEW_FUND_FORM)])
+    await bot_send_data(update, text, keyboard)
 
 
 async def new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -124,10 +190,10 @@ async def new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.delete_message()
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Нажмите на кнопку ниже, чтобы заполнить анкету",
+        text=s.PRESS_BUTTON_TO_FILL_FORM,
         reply_markup=ReplyKeyboardMarkup.from_button(
             KeyboardButton(
-                "Заполнить анкету",
+                s.FILL_FORM_BUTTON_TEXT,
                 # TODO: заменить на веб-приложение с формой
                 # Данные для подстановки в форму:
                 # context.user_data[AGE] - возраст
@@ -135,136 +201,114 @@ async def new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         ),
     )
-    return NEW_FUND
+    return s.NEW_FUND
+
+
+# 5: CONVERSATION ==================================================================================================================
+HANDLERS = (
+    ConversationHandler(
+        entry_points=[CommandHandler("start", greetings)],
+        states={
+            s.MAIN_CONVERSATION: [
+                CallbackQueryHandler(get_age, cbq.GET_AGE),
+                MessageHandler(filters.Regex(r"^\d{1,3}$"), check_age),
+                CallbackQueryHandler(get_location, cbq.GET_LOCATION),
+                CallbackQueryHandler(get_region, cbq.GET_REGION),
+                CallbackQueryHandler(get_country, cbq.GET_COUNTRY),
+                CallbackQueryHandler(get_city, is_city_requested),
+                CallbackQueryHandler(get_fund, is_fund_requested),
+                CallbackQueryHandler(get_funds_info, cbq.GET_FUNDS_INFO),
+                CallbackQueryHandler(no_fund, cbq.NO_FUND),
+                CallbackQueryHandler(new_fund_form, s.NEW_FUND_FORM),
+                CallbackQueryHandler(go_back, is_back),
+            ],
+        },
+        fallbacks=[CommandHandler("start", greetings)],
+    ),
+)
+
+
+'''
+
+# CallbackQueryHandler(get_fund, cbq.GET_FUND),
+
+CallbackQueryHandler(send_error, is_invalid_data),
+
+def is_invalid_data(data):
+    return True if isinstance(data, InvalidCallbackData) else False
+
+
+async def send_error(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_html(
+        text=get_text(update.callback_query.data), reply_markup=markup_OK(cbq.GET_AGE))
+
+
+
+
+# CallbackQueryHandler(check_country, cbq.CHECK_COUNTRY),
+
+async def check_country(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data[s.COUNTRY] = update.callback_query.data
+    if update.callback_query.data == "Казахстан":
+        return await get_fund(update, context)
+
+
+
+
+        (fund.name, cbq.CHECK_FUND + fund.name)
+        async for fund in Fund.objects.filter(
+        age_limit__from_age<=age)
+        # CoverageArea.objects.funds.all()
+
+
+
+
+
+
+async def check_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data[s.CITY] = update.callback_query.data
+    return await get_fund(update, context)
+
+
+async def check_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data[s.REGION] = update.callback_query.data
+    if update.callback_query.data not in (s.TWO_CAPITALS):
+        return await city(update, context)
+    return await fund(update, context)
+
+
+async def check_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    from .models import CoverageArea
+    context.user_data[s.CITY] = update.callback_query.data
+    region_from_mtpp = await CoverageArea.objects.aget(name=context.user_data[s.REGION])
+    city_from_mtpp = await CoverageArea.objects.aget(name=context.user_data[s.CITY])
+    if region_from_mtpp.id == city_from_mtpp.parent_id:
+        return await get_fund(update, context)
+    return ConversationHandler.END
+
+
+
+
+
+
+
 
 
 async def read_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
     json.loads(update.effective_message.web_app_data.data)
     # TODO: передать данные из формы в google таблицу
     await update.message.reply_html(
-        "Спасибо! Я передал твою заявку. Поcтараемся запустить проект в "
-        "твоем городе как можно скорее и обязательно свяжемся с тобой.",
+        text=s.START_PROJECT_REQUEST,
         reply_markup=ReplyKeyboardRemove(),
     )
     return ConversationHandler.END
 
 
-async def country(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.answer()
-    await update.callback_query.edit_message_text(
-        "Выбери страну",
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton("Казахстан", callback_data="Казахстан")],
-                # TODO: добавить пагинацию
-                [
-                    InlineKeyboardButton("Далее", callback_data="next"),
-                    InlineKeyboardButton("Назад", callback_data="prev"),
-                ],
-                [InlineKeyboardButton("Другая страна", callback_data="no_fund")],
-            ]
-        ),
-    )
-    return COUNTRY
-
-
-async def check_country(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data[COUNTRY] = update.callback_query.data
-    if update.callback_query.data == "Казахстан":
-        return await fund(update, context)
-    return ConversationHandler.END
-
-
-async def region(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    from .models import CoverageArea
-
-    regions_buttons = [
-        [InlineKeyboardButton(region.name, callback_data=region.name)]
-        async for region in CoverageArea.objects.filter(level=1)
-    ]
-    regions_buttons.extend(
-        [
-            [
-                InlineKeyboardButton("Далее", callback_data="next"),
-                InlineKeyboardButton("Назад", callback_data="prev"),
-            ],
-            [InlineKeyboardButton("Нет моего региона", callback_data="no_fund")],
-        ]
-    )
-    await update.callback_query.answer()
-    await update.callback_query.edit_message_text(
-        "Выбери регион",
-        reply_markup=InlineKeyboardMarkup(regions_buttons),
-    )
-    return REGION
-
-
-async def check_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data[REGION] = update.callback_query.data
-    if update.callback_query.data not in ("Москва", "Санкт-Петербург"):
-        return await city(update, context)
-    return await fund(update, context)
-
-
-async def city(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    from .models import CoverageArea
-
-    city = await CoverageArea.objects.aget(parent__name=context.user_data[REGION])
-    await update.callback_query.answer()
-    await update.callback_query.edit_message_text(
-        "Выбери город",
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton(city.name, callback_data=city.name)],
-                [InlineKeyboardButton("Нет моего города", callback_data="no_fund")],
-            ]
-        ),
-    )
-    return CITY
-
-
-async def check_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    from .models import CoverageArea
-
-    context.user_data[CITY] = update.callback_query.data
-    region_from_mtpp = await CoverageArea.objects.aget(name=context.user_data[REGION])
-    city_from_mtpp = await CoverageArea.objects.aget(name=context.user_data[CITY])
-    if region_from_mtpp.id == city_from_mtpp.parent_id:
-        return await fund(update, context)
-    return ConversationHandler.END
-
-
-async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if CITY not in context.user_data:
-        context.user_data[CITY] = update.callback_query.data
-    if FUND in context.user_data:
-        del context.user_data[FUND]
-    await update.callback_query.answer()
-    await update.callback_query.edit_message_text(
-        "Фонды, доступные в твоем городе",
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton("Почитать про фонды", callback_data="info")],
-                [InlineKeyboardButton("Арифметика добра", callback_data="Арифметика добра")],
-                [InlineKeyboardButton("Фонд 2", callback_data="Фонд 2")],
-                [InlineKeyboardButton("Фонд 3", callback_data="Фонд 3")],
-                [InlineKeyboardButton("Фонд 4", callback_data="Фонд 4")],
-                [InlineKeyboardButton("Фонд 5", callback_data="Фонд 5")],
-                [InlineKeyboardButton("Фонд 6", callback_data="Фонд 6")],
-                [InlineKeyboardButton("Фонд 7", callback_data="Фонд 7")],
-                # TODO: пагинация?
-                [InlineKeyboardButton("Изменить город?", callback_data="change_city")],
-            ]
-        ),
-    )
-    return FUND
-
-
 async def check_fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data[FUND] = {NAME: update.callback_query.data}
+    context.user_data[s.FUND] = {s.NAME: update.callback_query.data}
     if update.callback_query.data == "Арифметика добра":
-        context.user_data[FUND][URL] = "https://crm.a-dobra.ru/form/mentor"
-    if context.user_data[FUND].get(URL):
+        context.user_data[s.FUND][s.URL] = "https://crm.a-dobra.ru/form/mentor"
+    if context.user_data[s.FUND].get(s.URL):
         return await fund_has_form(update, context)
     await update.callback_query.answer()
     await update.callback_query.edit_message_text(
@@ -276,13 +320,13 @@ async def check_fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]
         ),
     )
-    return FUND
+    return s.FUND
 
 
 async def fund_has_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.answer()
     await update.callback_query.edit_message_text(
-        "У этого фонда есть своя анкета, заполни ее на сайте фонда по ссылке " f"{context.user_data[FUND][URL]}"
+        "У этого фонда есть своя анкета, заполни ее на сайте фонда по ссылке " f"{context.user_data[s.FUND][s.URL]}"
     )
     return ConversationHandler.END
 
@@ -307,7 +351,7 @@ async def fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         ),
     )
-    return FUND
+    return s.FUND
 
 
 async def read_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -320,71 +364,47 @@ async def read_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=ReplyKeyboardRemove(),
     )
     return ConversationHandler.END
+'''
 
 
-async def fund_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.callback_query.answer()
-    await update.callback_query.edit_message_text(
-        "\n\n".join(
-            [
-                "Арифметка добра - помогает детям-сиротам стать личностью, "
-                "поддерживает приемные семьи, содействует семейному устройству.",
-                "Старшие братья старшие сестры - подбирает наставников детям и "
-                "подросткам, находящихся в трудной жизненной ситуации.",
-                "В твоих руках - помогает подросткам, оставшимся без поддержки "
-                "родителям, подготовиться к самостоятельной жизни.",
-                "Волонтеры в помощь детям-сиротам - помогает детям сиротам в "
-                "детских домах и больницах, ищет им приемных родителей и "
-                "поддерживает семьи в трудной жизненной ситуации.",
-                "Дети+ - оказывает поддержку детям, подросткам и молодым людям с "
-                "ВИЧ, семьям, в которых живут дети с ВИЧ.",
-                "Дети наши - помогает в социальной адаптации воспитанников "
-                "детских домов, поддерживает кризисные семьи.",
-                "Солнечный город - помогает детям и семьям, которые оказались в трудной жизненной ситуации.",
-            ]
-        ),
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Понятно", callback_data="fund")]]),
-    )
-    return FUND
-
-
+'''
 HANDLERS = (
     ConversationHandler(
-        entry_points=[CommandHandler("start", start)],
+        entry_points=[CommandHandler("start", greetings)],
         states={
-            AGE: [
-                CallbackQueryHandler(age, "^age$"),
+            s.AGE: [
+                CallbackQueryHandler(age, s.AGE),  # "^age$"),
                 MessageHandler(filters.Regex(r"^\d{1,3}$"), check_age),
             ],
-            LOCATION: [
-                CallbackQueryHandler(region, "^other_city$"),
-                CallbackQueryHandler(country, "^other_country$"),
-                CallbackQueryHandler(check_location, "^.*$"),
+            s.LOCATION: [
+                CallbackQueryHandler(region, s.OTHER_CITY),  # "^other_city$"),
+                CallbackQueryHandler(country, s.OTHER_COUNTRY),  # "^other_country$"),
+                CallbackQueryHandler(check_location),  # , "^.*$"),
             ],
-            COUNTRY: [
+            s.COUNTRY: [
                 CallbackQueryHandler(no_fund, "^no_fund$"),
                 CallbackQueryHandler(country, "^next|prev$"),
                 CallbackQueryHandler(check_country, "^.*$"),
             ],
-            REGION: [
+            s.REGION: [
                 CallbackQueryHandler(no_fund, "^no_fund$"),
                 CallbackQueryHandler(region, "^next|prev$"),
                 CallbackQueryHandler(check_region, "^.*$"),
             ],
-            CITY: [
+            s.CITY: [
                 CallbackQueryHandler(no_fund, "^no_fund$"),
                 CallbackQueryHandler(city, "^next|prev$"),
                 CallbackQueryHandler(check_city, "^.*$"),
             ],
-            FUND: [
+            s.FUND: [
                 CallbackQueryHandler(location, "^change_city$"),
-                CallbackQueryHandler(fund_info, "^info$"),
+                CallbackQueryHandler(funds_info, "^info$"),
                 CallbackQueryHandler(fund, "^next|prev|fund$"),
                 CallbackQueryHandler(fund_form, "^fund_form$"),
                 CallbackQueryHandler(check_fund, "^.*$"),
                 MessageHandler(filters.StatusUpdate.WEB_APP_DATA, read_fund_form),
             ],
-            NEW_FUND: [
+            s.NEW_FUND: [
                 CallbackQueryHandler(new_fund_form, "^new_fund_form$"),
                 MessageHandler(
                     filters.StatusUpdate.WEB_APP_DATA,
@@ -392,6 +412,27 @@ HANDLERS = (
                 ),
             ],
         },
-        fallbacks=[CommandHandler("start", start)],
+        fallbacks=[CommandHandler("start", greetings)],
     ),
 )
+
+
+
+
+
+    if update.callback_query.data == s.MSK:
+        context.user_data[s.REGION] = s.MSK_reg
+        context.user_data[s.CITY] = s.MSK  # update.callback_query.data
+        return await fund(update, context)
+    elif update.callback_query.data == s.MSK_reg:
+        context.user_data[s.REGION] = s.MSK_reg
+        context.user_data[s.CITY] = s.MSK_reg  # update.callback_query.data
+        return await fund(update, context)
+    elif update.callback_query.data == s.SPB:
+        context.user_data[s.REGION] = s.SPB  # update.callback_query.data
+        context.user_data[s.CITY] = s.SPB  # update.callback_query.data
+        return await fund(update, context)
+    else:
+        context.user_data[s.REGION] = update.callback_query.data
+        return await region(update, context)
+'''

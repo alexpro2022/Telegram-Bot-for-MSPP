@@ -1,5 +1,6 @@
 from urllib.parse import urljoin
 
+from telegram.error import TelegramError
 from telegram.ext import Application
 
 import config.settings as settings
@@ -19,5 +20,5 @@ async def start_bot():
         else:
             await bot_app.updater.start_polling()
         await bot_app.start()
-    except Exception as error:
-        logger.error(error, exc_info=True)
+    except (TelegramError, RuntimeError):
+        logger.exception("Bot start sequence FAILED")

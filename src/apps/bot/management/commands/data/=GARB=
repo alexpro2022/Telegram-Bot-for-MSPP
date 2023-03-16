@@ -1,0 +1,48 @@
+    {"name": "CITY 1", "parent": "AREA 1"},
+    {"name": "CITY 2", "parent": "AREA 2"},
+    {"name": "CITY 3", "parent": "AREA 3"},
+    {"name": "CITY 4", "parent": "AREA 4"},
+    {"name": "CITY 5", "parent": "AREA 5"},
+    {"name": "CITY 6", "parent": "AREA 1"},
+    {"name": "CITY 7", "parent": "AREA 2"},
+    {"name": "CITY 8", "parent": "AREA 3"},
+    {"name": "CITY 9", "parent": "AREA 4"},
+    {"name": "CITY 10", "parent": "AREA 5"},
+    {"name": "CITY 11", "parent": "AREA 1"},
+    {"name": "CITY 12", "parent": "AREA 2"},
+    {"name": "CITY 13", "parent": "AREA 3"},
+    {"name": "CITY 14", "parent": "AREA 4"},
+    {"name": "CITY 15", "parent": "AREA 5"}
+
+
+
+    {
+        "age_limit": {"from_age": 18, "to_age": null},
+        "coverage_area": ["AREA 1", "AREA 2", "AREA 3", "CITY 1", "CITY 2", "CITY 3"],
+        "description": "DESCRIPTION FUND 1",
+        "name": "FUND 1"
+    },
+    {
+        "age_limit": {"from_age": 18, "to_age": null},
+        "coverage_area": ["AREA 1", "AREA 2", "AREA 3", "CITY 1", "CITY 2", "CITY 3"],
+        "description": "DESCRIPTION FUND 2",
+        "name": "FUND 2"
+    },
+    {
+        "age_limit": {"from_age": 18, "to_age": null},
+        "coverage_area": ["AREA 1", "AREA 2", "AREA 3", "CITY 1", "CITY 2", "CITY 3"],
+        "description": "DESCRIPTION FUND 3",
+        "name": "FUND 3"
+    },
+    {
+        "age_limit": {"from_age": 18, "to_age": null},
+        "coverage_area": ["AREA 1", "AREA 2", "AREA 3", "CITY 1", "CITY 2", "CITY 3"],
+        "description": "DESCRIPTION FUND 4",
+        "name": "FUND 4"
+    },
+    {
+        "age_limit": {"from_age": 18, "to_age": null},
+        "coverage_area": ["AREA 1", "AREA 2", "AREA 3", "CITY 1", "CITY 2", "CITY 3"],
+        "description": "DESCRIPTION FUND 5",
+        "name": "FUND 5"
+    }

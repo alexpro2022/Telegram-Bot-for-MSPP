@@ -2,7 +2,7 @@ import json
 
 from django.http import JsonResponse
 from django.views import View
-from telegram import Update
+from telegram import Update, error
 
 from .bot import bot_app
 from .logger import logger
@@ -20,5 +20,6 @@ class BotWebhookView(View):
             )
             return JsonResponse({})
 
-    except Exception as error:
-        logger.error(error, exc_info=True)
+    except error.TelegramError:  # Exception:  # as error:
+        # logger.error(error, exc_info=True)
+        logger.exception('Webhook update_queue FAILED')

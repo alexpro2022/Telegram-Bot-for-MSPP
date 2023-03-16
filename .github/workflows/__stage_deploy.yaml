@@ -122,10 +122,10 @@ jobs:
             TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }} 
             EOM
 
-            sudo docker compose -f infra/docker-compose.staging.yml stop
-            sudo docker compose -f infra/docker-compose.staging.yml rm -f
+            # sudo docker compose -f infra/docker-compose.staging.yml stop
+            sudo docker compose -f infra/docker-compose.staging.yml rm -s -f
             sudo docker rmi $(sudo docker images -qa)
             sudo docker compose -f infra/docker-compose.staging.yml up -d --quiet-pull
 
-            sudo docker compose -f infra/docker-compose.staging.yml exec backend python manage.py migrate
-            sudo docker compose -f infra/docker-compose.staging.yml exec backend python manage.py fill_data
+            sudo docker compose -f infra/docker-compose.staging.yml exec backend python manage.py migrate && python manage.py fill_data
+            # sudo docker compose -f infra/docker-compose.staging.yml exec backend python manage.py fill_data

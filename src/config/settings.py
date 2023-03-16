@@ -106,11 +106,6 @@ STATIC_ROOT = BASE_DIR / "static"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Telegram
-LOGGING_LEVEL = env("LOGGING_LEVEL", default="DEBUG")
-LOG_DIR = BASE_DIR / "logs"
-LOGGING_FILENAME = LOG_DIR / "system.log"
-LOGGING_FILENAME_BOT = LOG_DIR / "bot.log"
-FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
 TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")
 WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
 WEBHOOK_URL = env("WEBHOOK_URL", default=environ.Env.NOTSET if WEBHOOK_MODE else "")
@@ -132,9 +127,19 @@ ENV_INFO = {
     "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
 }
 
+# LOGGING
+LOGGING_LEVEL = env("LOGGING_LEVEL", default="DEBUG")
+LOG_DIR = BASE_DIR / "logs"
+LOGGING_FILENAME = LOG_DIR / "system.log"
+LOGGING_FILENAME_BOT = LOG_DIR / "bot.log"
+FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
 logging.basicConfig(
     level=LOGGING_LEVEL,
     filename=LOGGING_FILENAME,
     filemode="w",
     format="%(asctime)s %(levelname)s %(message)s",
 )
+
+DJANGO_SUPERUSER_PASSWORD = env("DJANGO_SUPERUSER_PASSWORD")
+DJANGO_SUPERUSER_EMAIL = env("DJANGO_SUPERUSER_EMAIL")
+DJANGO_SUPERUSER_USERNAME = env("DJANGO_SUPERUSER_USERNAME")
