@@ -236,11 +236,11 @@ async def backwards(update: Update, context: ContextTypes.DEFAULT_TYPE):
             case "city":
                 await get_city(
                     update, context,
-                    context.user_data.get(s.REGION))  # , s.MSK_reg))
+                    context.user_data.get(s.REGION))
             case "fund":
                 await get_fund(
                     update, context,
-                    context.user_data.get(s.CITY))  # , s.MSK))
+                    context.user_data.get(s.CITY))
 
 
 # 5: CONVERSATION ==================================================================================================================
