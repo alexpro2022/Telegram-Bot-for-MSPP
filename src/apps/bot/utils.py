@@ -3,7 +3,9 @@ from typing import List, Optional, Sequence, Tuple
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    Update,
 )
+from telegram.ext import ContextTypes, ConversationHandler
 
 from . import bot_settings as s
 
@@ -12,7 +14,7 @@ cbq = s.CallbackQueries
 __button = InlineKeyboardButton
 
 
-def get_text(text):
+def get_text(text: str) -> str:
     return text.format(s.USERNAME)
 
 
@@ -63,15 +65,65 @@ def is_fund_requested(data: str) -> bool:
     return is_requested(data, cbq.GET_FUND) or data == cbq.GET_FUND
 
 
-def is_back(data: str) -> bool:
+def is_backwards_requested(data: str) -> bool:
     return is_requested(data, cbq.GO_BACK)
 
 
-def add_if_unique(
-        stack: list,
-        text: str,
-        keyboard: InlineKeyboardMarkup
-) -> None:
-    data = {"text": text, "keyboard": keyboard}
+def add_if_unique(stack: list, data: str):
     if data not in stack:
         stack.append(data)
+
+
+def add_backwards(context, backwards: str):
+    add_if_unique(context.user_data[cbq.STACK], backwards)
+
+
+def check_region_for_exceptions(region):
+    if region in s.TWO_CAPITALS:
+        return "init"
+    return "region"
+
+
+def check_city_for_exceptions(city):
+    if city in s.TWO_CAPITALS:
+        return "init"
+    if city == "country":
+        return "country"
+    return "city"
+
+
+def initiate_user_data(context: ContextTypes.DEFAULT_TYPE):
+    context.user_data[s.COUNTRY] = "Россия"
+    context.user_data[cbq.STACK] = []
+
+
+# === BOT Actions ======================================================
+# to make bot_send_message
+async def message(update: Update, text: str, reply=None):
+    await update.message.reply_html(text, reply_markup=reply)
+
+
+async def bot_say_by(update: Update, text: str) -> int:
+    await message(update, text)
+    return ConversationHandler.END
+
+
+# to make as decorator later
+async def bot_send_data(
+    update: Update,
+    text: str,
+    keyboard: Optional[InlineKeyboardMarkup] = None,
+) -> None:
+    if update.message:
+        await update.message.reply_html(text, reply_markup=keyboard)
+    else:
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text(
+            text, reply_markup=keyboard)
+
+
+'''def set_location(
+    data: str, prefix: str, location_name: str,
+    context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    context.user_data[location_name] = data.replace(prefix, "")'''

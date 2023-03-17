@@ -51,6 +51,7 @@ MSK = "Москва"
 MSK_reg = "Московская область"
 SPB = "Санкт-Петербург"
 TWO_CAPITALS = (MSK, MSK_reg, SPB)
+KAZAHSTAN = "Казахстан"
 # FUNDS =======================================================
 FUND = "fund"
 NO_FUND = "no_fund"
@@ -100,6 +101,7 @@ URL = "URL"
 
 
 class CallbackQueries:
+    STACK = "STACK"
     GO_BACK = "go_back"
     SHORT_BACK_BUTTON = (GO_LEFT, GO_BACK)
     LONG_BACK_BUTTON = (GO_LEFT + " Назад", GO_BACK)
@@ -109,10 +111,12 @@ class CallbackQueries:
 # --------------------------------------------------
     GET_LOCATION = "get_location"
 # --------------------------------------------------
-    OTHER_COUNTRY = "Я не в России"
-    GET_COUNTRY = "get_contry"
+    OTHER_COUNTRY_TEXT = "Я не в России"
+    OTHER_COUNTRY = "Другая страна"
+    GET_COUNTRY = "get_country"
     CHECK_COUNTRY = "check_country"
-    BUTTON_OTHER_COUNTRY = (OTHER_COUNTRY, GET_COUNTRY)
+    BUTTON_OTHER_COUNTRY = (OTHER_COUNTRY_TEXT, GET_COUNTRY)
+    # BUTTON_OTHER_COUNTRY_NO_FUND = (OTHER_COUNTRY, NO_FUND + OTHER_COUNTRY)
 # --------------------------------------------------
     NO_MY_REGION_TEXT = "Нет моего региона " + SHRUGGING
     OTHER_REGION = "Выбрать другой регион"
