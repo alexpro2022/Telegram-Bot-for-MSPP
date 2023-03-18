@@ -120,10 +120,3 @@ async def bot_send_data(
         await update.callback_query.answer()
         await update.callback_query.edit_message_text(
             text, reply_markup=keyboard)
-
-
-'''def set_location(
-    data: str, prefix: str, location_name: str,
-    context: ContextTypes.DEFAULT_TYPE
-) -> None:
-    context.user_data[location_name] = data.replace(prefix, "")'''

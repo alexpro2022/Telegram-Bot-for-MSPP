@@ -1,5 +1,5 @@
 # import json
-# from typing import List, Optional
+from typing import Union
 
 from telegram import (
     # InlineKeyboardMarkup,
@@ -56,7 +56,7 @@ async def get_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def check_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
     age = int(update.message.text)
-    if s.AGE_LIMIT < age:
+    if s.AGE_LIMIT <= age:
         context.user_data[s.AGE] = age
         await get_location(update, context)
     else:
@@ -67,9 +67,9 @@ async def check_age(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def get_init_controls():
     text = get_text(s.WHAT_LOCATION)
     buttons = [
-        (s.MSK, cbq.GET_FUND + s.MSK),
-        (s.SPB, cbq.GET_FUND + s.SPB),
-        (s.MSK_reg, cbq.GET_CITY + s.MSK_reg),
+        (s.MSK + s.MOSCOW_EMOJI, cbq.GET_FUND + s.MSK),
+        (s.SPB + s.RAINING_EMOJI, cbq.GET_FUND + s.SPB),
+        (s.MSK_reg + s.MOSCOW_REGION_EMOJI, cbq.GET_CITY + s.MSK_reg),
         (cbq.BUTTON_OTHER_REGION),
         (cbq.BUTTON_OTHER_COUNTRY),
     ]
@@ -80,8 +80,7 @@ def get_init_controls():
 def get_country_controls():
     text = s.CHOOSE_COUNTRY
     buttons = [
-        (s.KAZAHSTAN, cbq.GET_FUND + s.COUNTRY),  # "country"),  # s.KAZAHSTAN),
-        # cbq.BUTTON_OTHER_COUNTRY_NO_FUND,
+        (s.KAZAHSTAN + s.KAZAHSTAN_EMOJI, cbq.GET_FUND + s.COUNTRY),
         (cbq.OTHER_COUNTRY, cbq.NO_FUND + s.COUNTRY),
     ]
     keyboard = get_keyboard(buttons, footer=cbq.LONG_BACK_BUTTON)
@@ -97,10 +96,9 @@ async def get_region_controls(parent_country=None):
         CoverageArea.objects.filter(level=1)
         if region.name not in s.TWO_CAPITALS
     ]
-    footer = (
-        (cbq.NO_MY_REGION_TEXT, cbq.NO_FUND + s.REGION),
-        cbq.LONG_BACK_BUTTON
-    )
+    footer = ([[
+        cbq.LONG_BACK_BUTTON,
+        (cbq.NO_MY_REGION_TEXT, cbq.NO_FUND + s.REGION), ]])
     keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
 
@@ -113,24 +111,29 @@ async def get_city_controls(parent_region):
         async for city in
         CoverageArea.objects.filter(parent__name=parent_region)
     ]
-    footer = (
-        (cbq.NO_MY_CITY_TEXT, cbq.NO_FUND + s.CITY),
-        cbq.LONG_BACK_BUTTON
-    )
+    footer = ([[
+        cbq.LONG_BACK_BUTTON,
+        (cbq.NO_MY_CITY_TEXT, cbq.NO_FUND + s.CITY), ]])
     keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
 
 
 async def get_fund_controls(parent_city, age):
-    # from .models import CoverageArea, Fund
+    from .models import Fund
     text = s.CHOOSE_FUND
     buttons = [
-        (cbq.FUNDS_INFO_TEXT, cbq.GET_FUNDS_INFO),
-        ("1 Арифметика добра", "Арифметика добра"),
-        ("2 Арифметика добра", "Арифметика добра"),
-        ("3 Арифметика добра", "Арифметика добра"),
+        (fund.name, fund.name)
+        async for fund in Fund.objects.filter(
+            coverage_area__name=parent_city,
+            age_limit__from_age__lte=age,
+        )
     ]
-    keyboard = get_keyboard(buttons, footer=cbq.LONG_BACK_BUTTON)
+    # package_for_funds_info = [button[0] for button in buttons]
+    # header = (cbq.FUNDS_INFO_TEXT, cbq.GET_FUNDS_INFO)
+    footer = ([[
+        cbq.LONG_BACK_BUTTON,
+        (cbq.FUNDS_INFO_TEXT, cbq.GET_FUNDS_INFO), ]])
+    keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
 
 
@@ -140,9 +143,11 @@ def parse_data(data: str, prefix: str) -> str:
 
 
 def set_location(
-    data: str, prefix: str, location_name: str,
+    data: Union[str, Update], prefix: str, location_name: str,
     context: ContextTypes.DEFAULT_TYPE
 ) -> None:
+    if isinstance(data, Update):
+        data = data.callback_query.data
     context.user_data[location_name] = parse_data(data, prefix)
     return context.user_data[location_name]
 
@@ -170,7 +175,8 @@ async def get_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_city(update: Update, context: ContextTypes.DEFAULT_TYPE, parent_region=None):
     if parent_region is None:
         parent_region = set_location(
-            update.callback_query.data, cbq.GET_CITY, s.REGION, context)
+            update,  # update.callback_query.data,
+            cbq.GET_CITY, s.REGION, context)
         add_backwards(context, check_region_for_exceptions(parent_region))
     text, keyboard = await get_city_controls(parent_region)
     await bot_send_data(update, text, keyboard)
@@ -180,7 +186,8 @@ async def get_fund(update: Update, context: ContextTypes.DEFAULT_TYPE, parent_ci
     age = context.user_data.get(s.AGE, 18)
     if parent_city is None:
         parent_city = set_location(
-            update.callback_query.data, cbq.GET_FUND, s.CITY, context)
+            update,  # .callback_query.data,
+            cbq.GET_FUND, s.CITY, context)
         add_backwards(context, check_city_for_exceptions(parent_city))
     text, keyboard = await get_fund_controls(parent_city, age)
     await bot_send_data(update, text, keyboard)
