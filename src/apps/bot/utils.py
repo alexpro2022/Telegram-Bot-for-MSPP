@@ -98,7 +98,6 @@ def initiate_user_data(context: ContextTypes.DEFAULT_TYPE):
 
 
 # === BOT Actions ======================================================
-# to make bot_send_message
 async def message(update: Update, text: str, reply=None):
     await update.message.reply_html(text, reply_markup=reply)
 
@@ -120,3 +119,7 @@ async def bot_send_data(
         await update.callback_query.answer()
         await update.callback_query.edit_message_text(
             text, reply_markup=keyboard)
+
+
+def get_back_button(text: str = "Назад") -> tuple[str, str]:
+    return s.GO_LEFT + text, cbq.GO_BACK

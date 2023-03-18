@@ -24,6 +24,14 @@ MOUNTAIN_EMOJI = " \U0001F304 "
 SNOWFLAKE_EMOJI = " \U00002744 "
 CLOUDY_EMOJI = " \U0001F324 "
 OTHER_REGIONS_EMOJI = CLOUDY_EMOJI + SNOWFLAKE_EMOJI
+FINISH = " \U0001F3C1 "
+SMILE = " \U0001F601 "
+NUMB = " \U0001F607 "
+SUNGLASSES = " \U0001F60E "
+
+# TEXT CONSTANTS =========================================================
+APPLICATION_FORM_TEXT = "{}, давай заполним анкету" + WRITING_HAND
+APPLY_FORM_BUTTON_TEXT = "Готово" + FINISH
 
 # CONVERSATION ===========================================================
 USERNAME = "To be implemented"
@@ -103,8 +111,8 @@ FUNDS_TEXT = (
     VOLONTIERS,
     KIDS_PLUS,
     OUR_KIDS,
-    SUN_CITY)
-FUNDS_INFO_SEPARATOR = "\n{}{}{}\n".format(GROWING_HEART, GROWING_HEART, GROWING_HEART)
+    SUN_CITY,)
+FUNDS_INFO_SEPARATOR = "\n{} {} {}\n".format(GROWING_HEART, GROWING_HEART, GROWING_HEART)
 FUNDS_DESCRIPTION = FUNDS_INFO_SEPARATOR.join(FUNDS_TEXT)
 
 NEW_FUND_CONFIRM_MESSAGE = "Да, давай" + THUMBS_UP
@@ -155,9 +163,11 @@ class CallbackQueries:
     GET_FUND = "get_fund"
     CHECK_FUND = "check_fund"
     GET_FUNDS_INFO = "funds_info"
+    GET_APPLICATION_FORM = "get_application_form"
     FUNDS_INFO_TEXT = "Про фонды" + BOOK_EMOJI
     BUTTON_OTHER_FUND = (OTHER_FUND, GET_FUND)
     NO_FUND = "no_fund"
+    SEND_SPREADSHEET = "send_spreadsheet"
 # --------------------------------------------------
 
 
@@ -171,6 +181,13 @@ TEST_DATA = (
 
 
 '''
+    {
+        "age_limit": {"from_age": 18, "to_age": null},
+        "coverage_area": ["Екатеринбург", "Зеленоградск", "Калининград", "Москва", "Московская область", "Санкт-Петербург"],
+        "description": "Старшие братья старшие сестры - подбирает наставников детям и подросткам, находящихся в трудной жизненной ситуации.",
+        "name": "Старшие братья старшие сестры"
+    }
+
 
     "Арифметка добра - помогает детям-сиротам стать личностью, "
     "поддерживает приемные семьи, содействует семейному устройству.",

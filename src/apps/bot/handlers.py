@@ -2,7 +2,6 @@
 from typing import Union
 
 from telegram import (
-    # InlineKeyboardMarkup,
     KeyboardButton,
     ReplyKeyboardMarkup,
     # ReplyKeyboardRemove,
@@ -28,6 +27,7 @@ from .utils import (
     bot_send_data,
     check_city_for_exceptions,
     check_region_for_exceptions,
+    get_back_button,
     get_keyboard,
     get_text,
     initiate_user_data,
@@ -73,7 +73,7 @@ def get_init_controls():
         (cbq.BUTTON_OTHER_REGION),
         (cbq.BUTTON_OTHER_COUNTRY),
     ]
-    keyboard = get_keyboard(buttons)
+    keyboard = get_keyboard(buttons, footer=get_back_button("Изменить возраст"))
     return text, keyboard
 
 
@@ -83,7 +83,7 @@ def get_country_controls():
         (s.KAZAHSTAN + s.KAZAHSTAN_EMOJI, cbq.GET_FUND + s.COUNTRY),
         (cbq.OTHER_COUNTRY, cbq.NO_FUND + s.COUNTRY),
     ]
-    keyboard = get_keyboard(buttons, footer=cbq.LONG_BACK_BUTTON)
+    keyboard = get_keyboard(buttons, footer=get_back_button("В начало"))
     return text, keyboard
 
 
@@ -97,7 +97,7 @@ async def get_region_controls(parent_country=None):
         if region.name not in s.TWO_CAPITALS
     ]
     footer = ([[
-        cbq.LONG_BACK_BUTTON,
+        get_back_button("В начало"),
         (cbq.NO_MY_REGION_TEXT, cbq.NO_FUND + s.REGION), ]])
     keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
@@ -112,26 +112,32 @@ async def get_city_controls(parent_region):
         CoverageArea.objects.filter(parent__name=parent_region)
     ]
     footer = ([[
-        cbq.LONG_BACK_BUTTON,
+        get_back_button(),
         (cbq.NO_MY_CITY_TEXT, cbq.NO_FUND + s.CITY), ]])
     keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
 
 
 async def get_fund_controls(parent_city, age):
-    from .models import Fund
+    # from .models import Fund
     text = s.CHOOSE_FUND
-    buttons = [
-        (fund.name, fund.name)
+    '''buttons = [
+        (fund.name, cbq.GET_APPLICATION_FORM + fund.name)
         async for fund in Fund.objects.filter(
             coverage_area__name=parent_city,
             age_limit__from_age__lte=age,
         )
     ]
-    # package_for_funds_info = [button[0] for button in buttons]
-    # header = (cbq.FUNDS_INFO_TEXT, cbq.GET_FUNDS_INFO)
+    '''
+    buttons = [
+        ("1 Арифметика добра", cbq.GET_APPLICATION_FORM + "1 Арифметика добра"),
+        ("2 Арифметика добра", cbq.GET_APPLICATION_FORM + "2 Арифметика добра"),
+        ("3 Арифметика добра", cbq.GET_APPLICATION_FORM + "3 Арифметика добра"),
+        ("4 Арифметика добра", cbq.GET_APPLICATION_FORM + "4 Арифметика добра"),
+        ("5 Арифметика добра", cbq.GET_APPLICATION_FORM + "5 Арифметика добра"),
+    ]
     footer = ([[
-        cbq.LONG_BACK_BUTTON,
+        get_back_button("Изменить город"),
         (cbq.FUNDS_INFO_TEXT, cbq.GET_FUNDS_INFO), ]])
     keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
@@ -155,9 +161,9 @@ def set_location(
 # 3: LOCATION ==================================================================================================================
 async def get_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     initiate_user_data(context)
+    add_backwards(context, s.AGE)
     text, keyboard = get_init_controls()
     await bot_send_data(update, text, keyboard)
-    # return s.MAIN_CONVERSATION
 
 
 async def get_country(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -175,8 +181,7 @@ async def get_region(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def get_city(update: Update, context: ContextTypes.DEFAULT_TYPE, parent_region=None):
     if parent_region is None:
         parent_region = set_location(
-            update,  # update.callback_query.data,
-            cbq.GET_CITY, s.REGION, context)
+            update, cbq.GET_CITY, s.REGION, context)
         add_backwards(context, check_region_for_exceptions(parent_region))
     text, keyboard = await get_city_controls(parent_region)
     await bot_send_data(update, text, keyboard)
@@ -186,8 +191,7 @@ async def get_fund(update: Update, context: ContextTypes.DEFAULT_TYPE, parent_ci
     age = context.user_data.get(s.AGE, 18)
     if parent_city is None:
         parent_city = set_location(
-            update,  # .callback_query.data,
-            cbq.GET_FUND, s.CITY, context)
+            update, cbq.GET_FUND, s.CITY, context)
         add_backwards(context, check_city_for_exceptions(parent_city))
     text, keyboard = await get_fund_controls(parent_city, age)
     await bot_send_data(update, text, keyboard)
@@ -199,6 +203,20 @@ async def get_funds_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = s.FUNDS_DESCRIPTION
     keyboard = markup_OK(cbq.GO_BACK)
     await bot_send_data(update, text, keyboard)
+
+
+async def get_application_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    add_backwards(context, "fund")
+    text = get_text(s.APPLICATION_FORM_TEXT)
+    buttons = ([])
+    footer = [[get_back_button("Изменить фонд"), (s.APPLY_FORM_BUTTON_TEXT, cbq.SEND_SPREADSHEET), ]]
+    keyboard = get_keyboard(buttons, footer=footer)
+
+    await bot_send_data(update, text, keyboard)
+
+
+async def send_spreadsheet(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pass
 
 
 async def no_fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -237,6 +255,7 @@ async def backwards(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await get_location(update, context)
     else:
         match category:
+            case s.AGE: await get_age(update, context)
             case "init": await get_location(update, context)
             case "country": await get_country(update, context)
             case "region": await get_region(update, context)
@@ -263,6 +282,8 @@ HANDLERS = (
                 CallbackQueryHandler(get_country, cbq.GET_COUNTRY),
                 CallbackQueryHandler(get_city, is_city_requested),
                 CallbackQueryHandler(get_fund, is_fund_requested),
+                CallbackQueryHandler(get_application_form, cbq.GET_APPLICATION_FORM),
+                CallbackQueryHandler(send_spreadsheet, cbq.SEND_SPREADSHEET),
                 CallbackQueryHandler(get_funds_info, cbq.GET_FUNDS_INFO),
                 CallbackQueryHandler(no_fund, cbq.NO_FUND),
                 CallbackQueryHandler(new_fund_form, s.NEW_FUND_FORM),
