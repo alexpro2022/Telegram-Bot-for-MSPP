@@ -8,6 +8,7 @@ import config.settings as settings
 from .handlers import HANDLERS
 from .logger import logger
 
+
 bot_app = Application.builder().token(settings.TELEGRAM_TOKEN).build()
 bot_app.add_handlers(HANDLERS)
 

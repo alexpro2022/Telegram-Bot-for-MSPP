@@ -23,22 +23,37 @@ DESERT_ISLAND_EMOJI = " \U0001F3DD "
 MOUNTAIN_EMOJI = " \U0001F304 "
 SNOWFLAKE_EMOJI = " \U00002744 "
 CLOUDY_EMOJI = " \U0001F324 "
-OTHER_REGIONS_EMOJI = CLOUDY_EMOJI + SNOWFLAKE_EMOJI
+WRESTLING = " \U0001F93C "
+VOLCANO = " \U0001F30B "
+OTHER_REGIONS_EMOJI = WRESTLING + SNOWFLAKE_EMOJI + VOLCANO
 FINISH = " \U0001F3C1 "
 SMILE = " \U0001F601 "
 NUMB = " \U0001F607 "
 SUNGLASSES = " \U0001F60E "
+RED_PILL = " \U0001F534 "
+BLUE_PILL = " \U0001F534 "
+MECHANIC = " \U0001F9D1 "
+COOK = " \U0001F469 "
+ARTIST = " \U0001F468 "
+PROFESSION = " "
+PHONE = " \U0001F4F1 "
+EMAIL = " \U0001F4E7 "
+
 
 # TEXT CONSTANTS =========================================================
-APPLICATION_FORM_TEXT = "{}, давай заполним анкету" + WRITING_HAND
-APPLY_FORM_BUTTON_TEXT = "Готово" + FINISH
+BOT_SPEAKING = BABY_ANGEL + "\n\n"
+TEXT_GET_EMAIL = (
+    BOT_SPEAKING + "{}, укажи через пробел:\n\nНомер телефона" + PHONE
+    + "\nАдрес электронной почты" + EMAIL + "\nСвою профессию" + PROFESSION
+)
+TEXT_FINAL_CONFIRMATION = BOT_SPEAKING + FINISH * 3 + "\n\nOK, {}, Остался последний шаг -"  # перед тобой выбор -  две таблетки - синяя и красная"
 
 # CONVERSATION ===========================================================
 USERNAME = "To be implemented"
 MAIN_CONVERSATION = "Главная ветка беседы"
-BOT_SPEAKING = BABY_ANGEL + "\n\n"
+
 GREETING = (
-    "{}, привет!\n\nЯ" + BABY_ANGEL + "бот проекта ЗНАЧИМ. Я помогу тебе встать на путь "
+    BOT_SPEAKING + "{}, привет!\n\nЯ бот проекта ЗНАЧИМ. Я помогу тебе встать на путь "
     "наставничества - стать настоящим другом для ребенка или подростка" + TEENS
     + ", которому нужна помощь.\n\nСначала я помогу тебе выбрать фонд, а затем заполнить "
     + WRITING_HAND + "небольшую анкету."
@@ -46,7 +61,7 @@ GREETING = (
 REFUSAL = (
     BOT_SPEAKING + "{}, спасибо, что ты уже стремишься помогать другим людям "
     + CLAPPING_HANDS + ", но стать наставником ты сможешь только, когда тебе "
-    "исполнится 18. А пока, я уверен, ты сможешь найти себя в другом "
+    "исполнится 18.\nА пока, я уверен, ты сможешь найти себя в другом "
     "волонтерском проекте. Удачи!!!" + THUMBS_UP
 )
 WHAT_AGE = BOT_SPEAKING + "Сколько тебе лет, {}?"
@@ -66,7 +81,8 @@ NO_FUND_MESSAGE = (
     "фонд, который занимается помощью детям-сиротам и детям, оставшимся "
     "без попечения родителей, чтобы мы запустили проект в твоем городе."
 )
-
+APPLICATION_FORM_TEXT = BOT_SPEAKING + "{}, осталось задать тебе пару вопросов и я заполню твою анкету" + WRITING_HAND
+APPLY_FORM_BUTTON_TEXT = "Готово" + FINISH
 # LOCATIONS ======================================================
 LOCATION = "location"
 COUNTRY = "country"
@@ -117,6 +133,7 @@ FUNDS_DESCRIPTION = FUNDS_INFO_SEPARATOR.join(FUNDS_TEXT)
 
 NEW_FUND_CONFIRM_MESSAGE = "Да, давай" + THUMBS_UP
 NEW_FUND_FORM = "new_fund_form"
+TEXT_NEW_APPLICATION = "Заполнить анкету" + GO_RIGHT
 
 # BUTTONS ==========================================================
 OK = "Понятно" + THUMBS_UP
@@ -163,12 +180,21 @@ class CallbackQueries:
     GET_FUND = "get_fund"
     CHECK_FUND = "check_fund"
     GET_FUNDS_INFO = "funds_info"
-    GET_APPLICATION_FORM = "get_application_form"
+    GET_APPLICATION_STARTED = "get_application_started"
     FUNDS_INFO_TEXT = "Про фонды" + BOOK_EMOJI
     BUTTON_OTHER_FUND = (OTHER_FUND, GET_FUND)
     NO_FUND = "no_fund"
-    SEND_SPREADSHEET = "send_spreadsheet"
 # --------------------------------------------------
+    GET_FIO = "get_fio"
+    SEND_SPREADSHEET = "send_spreadsheet"
+    GET_PROFESSION = "get_profession"
+    GET_EMAIL = "get_email"
+    GET_PHONE_NUMBER = "get_phone_number"
+    QUERY_FINAL_CONFIRMATION = "blue_pill"
+    SAY_BY = "say_by"
+
+
+# TEXT_GET_PROFESSION = BOT_SPEAKING + "{}, укажи
 
 
 TEST_DATA = (

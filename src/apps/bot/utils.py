@@ -5,7 +5,7 @@ from telegram import (
     InlineKeyboardMarkup,
     Update,
 )
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram.ext import ContextTypes
 
 from . import bot_settings as s
 
@@ -22,6 +22,18 @@ def button(text, callback_data, brackets=True):
     if brackets:
         return [__button(text, callback_data=callback_data)]
     return __button(text, callback_data=callback_data)
+
+
+# InlineKeyboardMarkup.from_button()
+# InlineKeyboardMarkup.from_column()
+# InlineKeyboardMarkup.from_row()
+
+def get_back_button(text: str = "Назад") -> tuple[str, str]:
+    return s.GO_LEFT + text, cbq.GO_BACK
+
+
+def get_button_row(*args, **kwargs):
+    return [args]
 
 
 def __keyboard_gen(args):  # : Sequence):
@@ -98,13 +110,8 @@ def initiate_user_data(context: ContextTypes.DEFAULT_TYPE):
 
 
 # === BOT Actions ======================================================
-async def message(update: Update, text: str, reply=None):
-    await update.message.reply_html(text, reply_markup=reply)
-
-
-async def bot_say_by(update: Update, text: str) -> int:
-    await message(update, text)
-    return ConversationHandler.END
+async def message(update: Update, text: str, reply_markup=None):
+    await update.message.reply_html(text, reply_markup=reply_markup)
 
 
 # to make as decorator later
@@ -119,7 +126,3 @@ async def bot_send_data(
         await update.callback_query.answer()
         await update.callback_query.edit_message_text(
             text, reply_markup=keyboard)
-
-
-def get_back_button(text: str = "Назад") -> tuple[str, str]:
-    return s.GO_LEFT + text, cbq.GO_BACK
