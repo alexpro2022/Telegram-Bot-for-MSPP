@@ -5,4 +5,5 @@ from .views import BotWebhookView
 
 urlpatterns = [
     path("", csrf_exempt(BotWebhookView.as_view()), name="bot_webhook"),
+    # path("applicationform/", application_form, name="application_form"),
 ]

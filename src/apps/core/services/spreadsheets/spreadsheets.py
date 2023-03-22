@@ -1,46 +1,56 @@
 import asyncio
-from typing import Any
 
 from aiogoogle import Aiogoogle, HTTPError
-from django.conf import settings
+# from django.conf import settings
+from config import settings
 
 from .auth import creds
 from .logger import logger
 
 
+PERMISSIONS_FIELDS = 'id'
+PERMISSIONS_BODY = {
+    'type': 'user',
+    'role': 'writer',
+    'emailAddress': settings.EMAIL_USER,
+}
+
+
 async def send(
     spreadsheetid: str,
-    table_values: list[list[Any]],
+    table_values: list[list],
 ) -> None:
-    """Отправляет переданные данные в Google таблицы.
 
-    Args:
-        spreadsheetid (str): ID Google таблицы
-        table_values (list[list[Any]]): Значения колонок
-
-    Raises:
-        HTTPError: Не удалось отправить сроку в таблицу
-    """
     async with Aiogoogle(service_account_creds=creds) as aiogoogle:
         range = f"1:{len(table_values)}"
+        update_body = {"majorDimension": "ROWS", "values": table_values}
 
-        update_body = {"majorDimension": "COLUMNS", "values": table_values}
+        service = await aiogoogle.discover("drive", "v3")
+        await aiogoogle.as_service_account(
+            service.permissions.create(
+                fileId=spreadsheetid,
+                json=PERMISSIONS_BODY,
+                fields=PERMISSIONS_FIELDS,
+            ))
         try:
             service = await aiogoogle.discover("sheets", "v4")
             await aiogoogle.as_service_account(
-                service.spreadsheets.values.append(
-                    spreadsheetId=spreadsheetid, range=range, valueInputOption="USER_ENTERED", json=update_body
+                service.spreadsheets.values.update(
+                    spreadsheetId=spreadsheetid,
+                    range=range, valueInputOption="USER_ENTERED",
+                    json=update_body
                 )
             )
-        except HTTPError as e:
+        except HTTPError:
             msg = "Не удалось отправить сроку в таблицу!"
-            logger.critical(msg, e)
+            # logger.critical(msg, e)
+            logger.exception(msg)
             raise HTTPError(msg)
         logger.info(settings.SPREADSHEETS_URL.format(spreadsheetid))
 
 
 def sender(
-    values: list[list[Any]],
+    values: list[list],
     spreadsheetid: str,
 ) -> None:
     """Отправляет переданные данные в Google таблицы.

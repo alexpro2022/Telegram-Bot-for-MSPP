@@ -1,86 +1,86 @@
-from typing import List, Optional, Sequence, Tuple
-
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     Update,
 )
-from telegram.ext import ContextTypes
+from telegram.ext import ConversationHandler, ContextTypes
 
 from . import bot_settings as s
 
 cbq = s.CallbackQueries
 
-__button = InlineKeyboardButton
+
+# ARGS ====================================================================
+def get_args_ahead(
+    text: str = "Вперед",
+    callback_query: str = "To be implemented",
+    sign: str = " \U0001F449 ",
+) -> tuple[str, str]:
+    return text + sign, callback_query
 
 
-def get_text(text: str) -> str:
-    return text.format(s.USERNAME)
+def get_args_back(
+    text: str = "Назад",
+    callback_query: str = cbq.GO_BACK,
+    sign: str = " \U0001F448 ",
+) -> tuple[str, str]:
+    return sign + text, callback_query
+# ============================================================================================================================================
 
 
-def button(text, callback_data, brackets=True):
-    if brackets:
-        return [__button(text, callback_data=callback_data)]
-    return __button(text, callback_data=callback_data)
-
-
-# InlineKeyboardMarkup.from_button()
-# InlineKeyboardMarkup.from_column()
-# InlineKeyboardMarkup.from_row()
-
-def get_back_button(text: str = "Назад") -> tuple[str, str]:
-    return s.GO_LEFT + text, cbq.GO_BACK
-
-
-def get_button_row(*args, **kwargs):
-    return [args]
-
-
-def __keyboard_gen(args):  # : Sequence):
-    for item1, item2 in args:
-        yield button(item1, item2) if isinstance(item1, str) \
-            else [  # logic for two half-buttons in one line
-                button(item1[0], item1[1], False),
-                button(item2[0], item2[1], False)]
-
-
+# MARKUPS ======================================================================================
 def get_keyboard(
-    args: List, *,
-    callback_data: bool = True,
-    header: Optional[Tuple] = None,
-    footer: Optional[Sequence] = None,
-):
-    buttons_args = args if callback_data else [(item, item) for item in args]
+    args: list[tuple[str, str]] | None = None,
+    *,
+    header: list[tuple[str, str]] | None = None,
+    footer: list[tuple[str, str]] | None = None,
+) -> InlineKeyboardMarkup:
+    keyboard = []
+    if args is not None:
+        keyboard = [[InlineKeyboardButton(text=item[0], callback_data=item[1])] for item in args]
     if header is not None:
-        buttons_args.insert(0, header)
+        header_buttons = [InlineKeyboardButton(text=item[0], callback_data=item[1]) for item in header]
+        keyboard.insert(0, header_buttons)
     if footer is not None:
-        if isinstance(footer[0], str):
-            buttons_args.append(footer)
-        else:
-            buttons_args.extend(footer)
-    return InlineKeyboardMarkup(tuple(__keyboard_gen(buttons_args)))
+        footer_buttons = [InlineKeyboardButton(text=item[0], callback_data=item[1]) for item in footer]
+        keyboard.append(footer_buttons)
+    return InlineKeyboardMarkup(keyboard)
 
 
-def markup_OK(callback_data):
-    return InlineKeyboardMarkup([button(s.OK, callback_data)])
+def get_single_button(text: str, callback_data: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup.from_button(
+        InlineKeyboardButton(text, callback_data=callback_data))
 
 
+def get_markup_OK(callback_data: str) -> InlineKeyboardMarkup:
+    return get_single_button(s.OK, callback_data)
+# ============================================================================================================================================
+
+
+def get_text(text: str, insert: str | None = None) -> str:
+    insert = s.USERNAME if insert is None else insert
+    return text.format(insert)
+
+
+# Callback_data handlers =====================================================================
 def is_requested(data: str, prefix: str):
     return True if data.startswith(prefix) else False
 
 
-def is_city_requested(data: str) -> bool:
-    return is_requested(data, cbq.GET_CITY)
+def is_city_requested(callback_data: str) -> bool:
+    return is_requested(callback_data, cbq.GET_CITY)
 
 
-def is_fund_requested(data: str) -> bool:
-    return is_requested(data, cbq.GET_FUND) or data == cbq.GET_FUND
+def is_fund_requested(callback_data: str) -> bool:
+    return is_requested(callback_data, cbq.GET_FUND) or callback_data == cbq.GET_FUND
 
 
-def is_backwards_requested(data: str) -> bool:
-    return is_requested(data, cbq.GO_BACK)
+def is_backwards_requested(callback_data: str) -> bool:
+    return is_requested(callback_data, cbq.GO_BACK)
+# ============================================================================================================================================
 
 
+# Bacwards ==================================================================================
 def add_if_unique(stack: list, data: str):
     if data not in stack:
         stack.append(data)
@@ -102,27 +102,40 @@ def check_city_for_exceptions(city):
     if city == "country":
         return "country"
     return "city"
+# ============================================================================================================================================
 
 
-def initiate_user_data(context: ContextTypes.DEFAULT_TYPE):
-    context.user_data[s.COUNTRY] = "Россия"
-    context.user_data[cbq.STACK] = []
-
-
-# === BOT Actions ======================================================
-async def message(update: Update, text: str, reply_markup=None):
-    await update.message.reply_html(text, reply_markup=reply_markup)
-
-
-# to make as decorator later
-async def bot_send_data(
+# === BOT Actions ============================================================================================================================
+async def message(
     update: Update,
     text: str,
-    keyboard: Optional[InlineKeyboardMarkup] = None,
+    keyboard: InlineKeyboardMarkup | None = None
+):
+    await update.message.reply_html(text, reply_markup=keyboard)
+
+
+async def bot_send_data(  # to make as decorator later
+    update: Update,
+    text: str,
+    keyboard: InlineKeyboardMarkup | None = None,
 ) -> None:
     if update.message:
-        await update.message.reply_html(text, reply_markup=keyboard)
+        await message(update, text, keyboard)
+        # await update.message.reply_html(text, reply_markup=keyboard)
     else:
         await update.callback_query.answer()
         await update.callback_query.edit_message_text(
             text, reply_markup=keyboard)
+
+
+async def bot_say_by(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    text = context.user_data.get(
+        s.TEXT_SAY_BY,
+        "You have to impement your text in the context.user_data['text_say_by']")
+    await message(update, text)
+    return ConversationHandler.END
+# ============================================================================================================================================
+
+
+def set_username(update: Update):
+    s.USERNAME = update.message.from_user.first_name

@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -48,7 +49,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -110,23 +111,6 @@ TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")
 WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
 WEBHOOK_URL = env("WEBHOOK_URL", default=environ.Env.NOTSET if WEBHOOK_MODE else "")
 
-# Google
-CREDENTIALS_TYPE = env("CREDENTIALS_TYPE", default="env")
-SPREADSHEETS_URL = "https://docs.google.com/spreadsheets/d/{0}"
-SPREADSHEET_ID = env("SPREADSHEET_ID", default="_")
-SCOPES = ("https://www.googleapis.com/auth/spreadsheets",)
-
-EMAIL_USER = env("EMAIL", default="example@mail.com")
-PRIVATE_KEY = env.str("PRIVATE_KEY", multiline=True, default="_")
-ENV_INFO = {
-    "project_id": env("PROJECT_ID", default="_"),
-    "private_key_id": env("PRIVATE_KEY_ID", default="_"),
-    "private_key": PRIVATE_KEY,
-    "client_email": env("CLIENT_EMAIL", default="_"),
-    "client_id": env("CLIENT_ID", default="_"),
-    "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
-}
-
 # LOGGING
 LOGGING_LEVEL = env("LOGGING_LEVEL", default="DEBUG")
 LOG_DIR = BASE_DIR / "logs"
@@ -143,3 +127,43 @@ logging.basicConfig(
 DJANGO_SUPERUSER_PASSWORD = env("DJANGO_SUPERUSER_PASSWORD")
 DJANGO_SUPERUSER_EMAIL = env("DJANGO_SUPERUSER_EMAIL")
 DJANGO_SUPERUSER_USERNAME = env("DJANGO_SUPERUSER_USERNAME")
+
+# Google date
+
+# PROJECT_ID = env("PROJECT_ID")
+# PRIVATE_KEY_ID = env("PRIVATE_KEY_ID")
+# PRIVATE_KEY =
+# CLIENT_EMAIL = env("CLIENT_EMAIL")
+# CLIENT_ID = env("CLIENT_ID")
+# CLIENT_X509_CERT_URL = env("CLIENT_X509_CERT_URL")
+
+
+# Google
+CREDENTIALS_TYPE = env("CREDENTIALS_TYPE", default="env")
+SPREADSHEETS_URL = "https://docs.google.com/spreadsheets/d/{0}"
+SPREADSHEET_ID = env("SPREADSHEET_ID", default="_")
+SCOPES = ("https://www.googleapis.com/auth/spreadsheets",)
+
+EMAIL_USER = env("EMAIL", default="example@mail.com")
+
+PRIVATE_KEY = env.str("PRIVATE_KEY", multiline=True, default="_")
+ENV_INFO = {
+    "project_id": env("PROJECT_ID", default="_"),
+    "private_key_id": env("PRIVATE_KEY_ID", default="_"),
+    "private_key": env("PRIVATE_KEY"),
+    "client_email": env("CLIENT_EMAIL", default="_"),
+    "client_id": env("CLIENT_ID", default="_"),
+    "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
+}
+
+WEBAPP_HTML = env(
+    "WEBAPP_HTML",
+    default="https://docs.python-telegram-bot.org/en/stable/examples.webappbot.html",
+)
+
+
+class PRE_FILL_DATA:
+    age: str
+    fund: str
+    region: str = " "
+    city: str = " "

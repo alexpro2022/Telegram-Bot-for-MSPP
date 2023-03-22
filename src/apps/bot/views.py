@@ -2,6 +2,7 @@ import json
 
 from django.http import JsonResponse
 from django.views import View
+from django.shortcuts import render
 from telegram import Update, error
 
 from .bot import bot_app
@@ -23,3 +24,9 @@ class BotWebhookView(View):
     except error.TelegramError:  # Exception:  # as error:
         # logger.error(error, exc_info=True)
         logger.exception('Webhook update_queue FAILED')
+
+
+def application_form(request):
+    template_name = 'registration.html'
+    context = {}  # values to pre-fill fields
+    return render(request, template_name, context)

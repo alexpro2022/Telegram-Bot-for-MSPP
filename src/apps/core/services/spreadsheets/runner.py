@@ -1,12 +1,10 @@
-from typing import Any
-
 from django.conf import settings
 
 from .spreadsheets import sender
 
 
 def send_to_google_sheets(
-    values: list[list[Any]],
+    values: list[list],
     spreadsheetid: str = settings.SPREADSHEET_ID,
 ) -> None:
     """Отправляет переданные данные в Google таблицы.

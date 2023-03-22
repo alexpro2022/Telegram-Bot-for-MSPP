@@ -14,18 +14,16 @@ WRITING_HAND = " \U0000270D "
 HANDSHAKE = " \U0001F91D "
 SHRUGGING = " \U0001F937 "
 RAINING_EMOJI = " \U000026C8 "
-MOSCOW_EMOJI = " \U0001F4AA "
+FORCE_EMOJI = " \U0001F4AA "
 REGIIONS_EMOJI = " \U00002708 "
-OUTSIDE_EMOJI = " \U0001F30D \U0001F30E \U0001F30F "
-MOSCOW_REGION_EMOJI = " \U0001F6E3 "
-KAZAHSTAN_EMOJI = " \U0001F40E "
+MOTORWAY_EMOJI = " \U0001F6E3 "
+HORSE_EMOJI = " \U0001F40E "
 DESERT_ISLAND_EMOJI = " \U0001F3DD "
 MOUNTAIN_EMOJI = " \U0001F304 "
 SNOWFLAKE_EMOJI = " \U00002744 "
 CLOUDY_EMOJI = " \U0001F324 "
 WRESTLING = " \U0001F93C "
 VOLCANO = " \U0001F30B "
-OTHER_REGIONS_EMOJI = WRESTLING + SNOWFLAKE_EMOJI + VOLCANO
 FINISH = " \U0001F3C1 "
 SMILE = " \U0001F601 "
 NUMB = " \U0001F607 "
@@ -38,7 +36,18 @@ ARTIST = " \U0001F468 "
 PROFESSION = " "
 PHONE = " \U0001F4F1 "
 EMAIL = " \U0001F4E7 "
+OUTSIDE_EMOJI = " \U0001F30D \U0001F30E \U0001F30F "
+FINGER_POINTER = " \U0001FAF5 "
 
+# === APPLICATION EMOJI ===
+SPACER = "  "
+MOSCOW_EMOJI = SPACER + FORCE_EMOJI
+MSK_reg_EMOJI = SPACER + MOTORWAY_EMOJI
+SPB_EMOJI = SPACER + RAINING_EMOJI
+OTHER_REGIONS_EMOJI = SPACER + WRESTLING + SNOWFLAKE_EMOJI + VOLCANO
+KAZAHSTAN_EMOJI = SPACER + HORSE_EMOJI
+OUTHER_COUNTRY_EMOJI = SPACER + OUTSIDE_EMOJI
+EXIT_EMOJI = FINGER_POINTER
 
 # TEXT CONSTANTS =========================================================
 BOT_SPEAKING = BABY_ANGEL + "\n\n"
@@ -47,11 +56,13 @@ TEXT_GET_EMAIL = (
     + "\nАдрес электронной почты" + EMAIL + "\nСвою профессию" + PROFESSION
 )
 TEXT_FINAL_CONFIRMATION = BOT_SPEAKING + FINISH * 3 + "\n\nOK, {}, Остался последний шаг -"  # перед тобой выбор -  две таблетки - синяя и красная"
+TEXT_GET_FIO = BOT_SPEAKING + "{}, укажи через пробел: Фамилия Имя Отчество"
+TEXT_FINISH = "Готово" + SPACER + FINISH
 
 # CONVERSATION ===========================================================
 USERNAME = "To be implemented"
 MAIN_CONVERSATION = "Главная ветка беседы"
-
+TEXT_SAY_BY = "text_say_by"
 GREETING = (
     BOT_SPEAKING + "{}, привет!\n\nЯ бот проекта ЗНАЧИМ. Я помогу тебе встать на путь "
     "наставничества - стать настоящим другом для ребенка или подростка" + TEENS
@@ -157,7 +168,7 @@ class CallbackQueries:
 # --------------------------------------------------
     GET_LOCATION = "get_location"
 # --------------------------------------------------
-    OTHER_COUNTRY_TEXT = "Я не в России" + OUTSIDE_EMOJI
+    OTHER_COUNTRY_TEXT = "Я не в России" + OUTHER_COUNTRY_EMOJI
     OTHER_COUNTRY = "Другая страна" + DESERT_ISLAND_EMOJI
     GET_COUNTRY = "get_country"
     CHECK_COUNTRY = "check_country"
@@ -184,17 +195,16 @@ class CallbackQueries:
     FUNDS_INFO_TEXT = "Про фонды" + BOOK_EMOJI
     BUTTON_OTHER_FUND = (OTHER_FUND, GET_FUND)
     NO_FUND = "no_fund"
+    GET_NEW_FUND_FORM = "get_new_fund_form"
 # --------------------------------------------------
     GET_FIO = "get_fio"
+    NEW_APPLICATION_FORM = "new_application_form"
     SEND_SPREADSHEET = "send_spreadsheet"
     GET_PROFESSION = "get_profession"
     GET_EMAIL = "get_email"
     GET_PHONE_NUMBER = "get_phone_number"
-    QUERY_FINAL_CONFIRMATION = "blue_pill"
+    GET_FINAL_CONFIRMATION = "blue_pill"
     SAY_BY = "say_by"
-
-
-# TEXT_GET_PROFESSION = BOT_SPEAKING + "{}, укажи
 
 
 TEST_DATA = (
