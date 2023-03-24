@@ -101,8 +101,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = "static/"
+STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "static"
+# STATICFILES_DIRS необходимо закомментировать или удалить
+# STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -160,6 +163,12 @@ WEBAPP_HTML = env(
     "WEBAPP_HTML",
     default="https://docs.python-telegram-bot.org/en/stable/examples.webappbot.html",
 )
+
+# APPLICATION_URL = env("APPLICATION_URL", default='130.193.48.219')
+# RELATIVE_URL = "bot/registration/"
+# WEBAPP_URL = env("WEBAPP_URL", default=urljoin(APPLICATION_URL, RELATIVE_URL))
+
+USER_DATA = {}
 
 
 class PRE_FILL_DATA:
