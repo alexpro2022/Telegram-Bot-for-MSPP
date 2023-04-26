@@ -1,12 +1,7 @@
 # import json
 
-from telegram import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    ReplyKeyboardRemove,
-    Update,
-)
-from telegram.ext import ConversationHandler, ContextTypes
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram.ext import ContextTypes, ConversationHandler
 
 from . import bot_settings as s
 

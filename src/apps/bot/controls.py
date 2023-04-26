@@ -3,13 +3,7 @@ from telegram.ext import ContextTypes
 
 from . import bot_settings as s
 # from .models import CoverageArea, Fund
-from .utils import (
-    get_args_back,
-    get_keyboard,
-    get_markup_OK,
-    get_text,
-)
-
+from .utils import get_args_back, get_keyboard, get_markup_OK, get_text
 
 cbq = s.CallbackQueries
 

@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.urls import reverse
-
 from telegram import Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -11,12 +10,14 @@ from telegram.ext import (
     filters,
 )
 
+from apps.registration.utils import read_web_app, send_to_google, webapp
+
 from . import bot_settings as s
 from . import controls
 from .utils import (
     add_backwards,
-    bot_send_data,
     bot_say_by,
+    bot_send_data,
     check_city_for_exceptions,
     check_region_for_exceptions,
     get_text,
@@ -26,11 +27,6 @@ from .utils import (
     message,
     set_text_by,
     set_username,
-)
-from apps.registration.utils import (
-    read_web_app,
-    send_to_google,
-    webapp,
 )
 
 cbq = s.CallbackQueries

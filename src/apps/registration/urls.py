@@ -1,10 +1,6 @@
 from django.urls import path
 
-from .views import (
-    registration_new_fund,
-    registration_new_user,
-)
-
+from .views import registration_new_fund, registration_new_user
 
 urlpatterns = [
     path("new-fund/<str:age>/",

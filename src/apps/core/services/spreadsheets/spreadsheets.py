@@ -1,12 +1,12 @@
 import asyncio
 
 from aiogoogle import Aiogoogle, HTTPError
+
 # from django.conf import settings
 from config import settings
 
 from .auth import creds
 from .logger import logger
-
 
 PERMISSIONS_FIELDS = 'id'
 PERMISSIONS_BODY = {

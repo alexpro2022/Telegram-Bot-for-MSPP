@@ -1,6 +1,6 @@
 # from typing import Optional, Union
 
-from telegram import Update, InlineKeyboardMarkup
+from telegram import InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from . import bot_settings as s

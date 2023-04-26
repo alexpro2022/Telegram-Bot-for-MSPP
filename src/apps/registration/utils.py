@@ -1,18 +1,11 @@
 import json
 
-from telegram import (
-    KeyboardButton,
-    ReplyKeyboardMarkup,
-    ReplyKeyboardRemove,
-    Update,
-    WebAppInfo,
-)
-from telegram.ext import ConversationHandler, ContextTypes
+from telegram import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, WebAppInfo
+from telegram.ext import ContextTypes, ConversationHandler
 
 from apps.bot import bot_settings as s
 from apps.bot import controls
 from apps.bot.utils import add_backwards, bot_send_data
-
 
 cbq = s.CallbackQueries
 
@@ -20,7 +13,7 @@ cbq = s.CallbackQueries
 async def webapp(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
-    url: str = "https://flaskrenderer.alexpro2022.repl.co",
+    url: str,
     message_text: str = "Нажми на кнопку ниже, чтобы заполнить анкету",
     button_text: str = "Заполнить анкету",
 ) -> None:
