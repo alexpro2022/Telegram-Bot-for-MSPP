@@ -73,7 +73,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo mkdir -p ${{ secrets.PROJECT_NAME }}
-            sudo chmod 777 ${{ secrets.PROJECT_NAME }} 
+            sudo chmod -R 777 ${{ secrets.PROJECT_NAME }} 
             sudo cat > ${{ secrets.PROJECT_NAME }}/.env << _EOF_
               POSTGRES_DB=${{ secrets.POSTGRES_DB }}
               POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
