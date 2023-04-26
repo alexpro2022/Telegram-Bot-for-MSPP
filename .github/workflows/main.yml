@@ -97,7 +97,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          source: "infra/docker-compose.yml, infra/nginx.conf"
+          source: "infra/docker-compose.yml, infra/swag.conf"
           target: ${{ secrets.PROJECT_NAME }}
           overwrite: true
           strip_components: 1

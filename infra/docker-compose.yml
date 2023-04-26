@@ -1,29 +1,25 @@
 services:
-
   postgres:
     image: postgres:15.2
-    container_name: postgres_my
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
-      - ../.env_my
+      - ./.env
 
   backend:
-    build: ..
-    container_name: backend_my
+    image: "${DOCKERHUB_USERNAME}/${PROJECT_NAME}"
     restart: always
     depends_on:
       - postgres
     volumes:
-      - ./logs:/app/logs
+      # - ./logs:/app/logs
       - static_value:/app/static/
     env_file:
-      - ../.env_my
+      - ./.env
 
   swag:
     image: lscr.io/linuxserver/swag
-    container_name: swag
     depends_on:
       - backend
     cap_add:
@@ -43,7 +39,5 @@ services:
 
 volumes:
   postgres_data:
-    name: postgres_my
   static_value:
-    name: static_my
     

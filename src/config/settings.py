@@ -12,7 +12,7 @@ env = environ.Env()
 
 SECRET_KEY = env("SECRET_KEY", default=get_random_secret_key())
 
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = env.bool("DEBUG", default=True)
 
 DOMAIN = env("DOMAIN", default="mspp-bot.duckdns.org")
 APPLICATION_URL = f"https://{DOMAIN}"
