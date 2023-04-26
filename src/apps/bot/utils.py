@@ -1,6 +1,9 @@
+# import json
+
 from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    ReplyKeyboardRemove,
     Update,
 )
 from telegram.ext import ConversationHandler, ContextTypes
@@ -36,14 +39,15 @@ def get_keyboard(
     footer: list[tuple[str, str]] | None = None,
 ) -> InlineKeyboardMarkup:
     keyboard = []
-    if args is not None:
-        keyboard = [[InlineKeyboardButton(text=item[0], callback_data=item[1])] for item in args]
     if header is not None:
-        header_buttons = [InlineKeyboardButton(text=item[0], callback_data=item[1]) for item in header]
-        keyboard.insert(0, header_buttons)
+        keyboard.append(
+            [InlineKeyboardButton(text=item[0], callback_data=item[1]) for item in header])
+    if args is not None:
+        keyboard.extend(
+            [[InlineKeyboardButton(text=item[0], callback_data=item[1])] for item in args])
     if footer is not None:
-        footer_buttons = [InlineKeyboardButton(text=item[0], callback_data=item[1]) for item in footer]
-        keyboard.append(footer_buttons)
+        keyboard.append(
+            [InlineKeyboardButton(text=item[0], callback_data=item[1]) for item in footer])
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -54,7 +58,19 @@ def get_single_button(text: str, callback_data: str) -> InlineKeyboardMarkup:
 
 def get_markup_OK(callback_data: str) -> InlineKeyboardMarkup:
     return get_single_button(s.OK, callback_data)
+
+
+async def remove_keyboard(update: Update, text: str = "") -> str:
+    await update.message.reply_text(text, reply_markup=ReplyKeyboardRemove())
 # ============================================================================================================================================
+
+
+def get_username(update: Update):
+    return update.message.from_user.first_name
+
+
+def set_username(update: Update):
+    s.USERNAME = update.message.from_user.first_name
 
 
 def get_text(text: str, insert: str | None = None) -> str:
@@ -77,32 +93,30 @@ def is_fund_requested(callback_data: str) -> bool:
 
 def is_backwards_requested(callback_data: str) -> bool:
     return is_requested(callback_data, cbq.GO_BACK)
-# ============================================================================================================================================
 
 
 # Bacwards ==================================================================================
-def add_if_unique(stack: list, data: str):
+def add_if_unique(stack: list, data: str) -> None:
     if data not in stack:
         stack.append(data)
 
 
-def add_backwards(context, backwards: str):
+def add_backwards(context: ContextTypes.DEFAULT_TYPE, backwards: str) -> None:
     add_if_unique(context.user_data[cbq.STACK], backwards)
 
 
-def check_region_for_exceptions(region):
+def check_region_for_exceptions(region: str) -> str:
     if region in s.TWO_CAPITALS:
         return "init"
     return "region"
 
 
-def check_city_for_exceptions(city):
-    if city in s.TWO_CAPITALS:
+def check_city_for_exceptions(place: str) -> str:
+    if place in s.TWO_CAPITALS:
         return "init"
-    if city == "country":
+    if place == "country":
         return "country"
     return "city"
-# ============================================================================================================================================
 
 
 # === BOT Actions ============================================================================================================================
@@ -114,18 +128,21 @@ async def message(
     await update.message.reply_html(text, reply_markup=keyboard)
 
 
-async def bot_send_data(  # to make as decorator later
+async def bot_send_data(
     update: Update,
     text: str,
     keyboard: InlineKeyboardMarkup | None = None,
 ) -> None:
     if update.message:
         await message(update, text, keyboard)
-        # await update.message.reply_html(text, reply_markup=keyboard)
     else:
         await update.callback_query.answer()
         await update.callback_query.edit_message_text(
             text, reply_markup=keyboard)
+
+
+def set_text_by(context: ContextTypes.DEFAULT_TYPE, text: str) -> None:
+    context.user_data[s.TEXT_SAY_BY] = text
 
 
 async def bot_say_by(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -134,8 +151,3 @@ async def bot_say_by(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         "You have to impement your text in the context.user_data['text_say_by']")
     await message(update, text)
     return ConversationHandler.END
-# ============================================================================================================================================
-
-
-def set_username(update: Update):
-    s.USERNAME = update.message.from_user.first_name

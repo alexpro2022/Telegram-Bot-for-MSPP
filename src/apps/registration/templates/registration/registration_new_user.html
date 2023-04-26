@@ -1,0 +1,19 @@
+{% extends 'registration/base.html' %}
+{% block title %}Регистрация нового пользователя{% endblock %} 
+{% block content %}
+    <form class="form row" name="registration_new_user">
+      {% csrf_token %}
+      <div class="form-title">
+        <p id="formtitle">Пожалуйста, заполните данную форму.</p>
+      </div>
+      {% include "registration/includes/surname_field.html" %}
+      {% include "registration/includes/name_field.html" %}      
+      {% include "registration/includes/patronymic_field.html" %} 
+      {% include "registration/includes/occupation_field.html" %}
+      {% include "registration/includes/email_field.html" %}
+      {% include "registration/includes/phone_field.html" %} 
+      {% include "registration/includes/age_field.html" %} 
+      {% include "registration/includes/location_field.html" %}
+      {% include "registration/includes/fund_field.html" %}   
+    </form>
+{% endblock %}

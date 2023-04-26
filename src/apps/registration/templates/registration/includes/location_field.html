@@ -1,0 +1,13 @@
+{% if city or region %}
+    <div class="input-field col s12">
+        <input id="location" name="location" type="text" disabled>
+        <label for="location">Город и/или Регион: {{ city }} {{ region }}</label>
+        <span class="helper-text location"></span>
+    </div>
+{% else %}
+    <div class="input-field col s12">
+        <input id="location" name="location" type="text" class="validate" minlength="2" maximumlength="100" required>
+        <label for="location">Город и Регион</label>
+        <span class="helper-text location"></span>
+    </div>
+{% endif %}

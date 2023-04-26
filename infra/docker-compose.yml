@@ -1,0 +1,49 @@
+services:
+
+  postgres:
+    image: postgres:15.2
+    container_name: postgres_my
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ../.env_my
+
+  backend:
+    build: ..
+    container_name: backend_my
+    restart: always
+    depends_on:
+      - postgres
+    volumes:
+      - ./logs:/app/logs
+      - static_value:/app/static/
+    env_file:
+      - ../.env_my
+
+  swag:
+    image: lscr.io/linuxserver/swag
+    container_name: swag
+    depends_on:
+      - backend
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - URL=mspp-bot.duckdns.org
+      - VALIDATION=http
+      - CERTPROVIDER=zerossl
+      - EMAIL=proa6191@gmail.com
+    volumes:
+      - ./swag.conf:/config/nginx/site-confs/default.conf
+      - static_value:/var/html/static/
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: postgres_my
+  static_value:
+    name: static_my
+    

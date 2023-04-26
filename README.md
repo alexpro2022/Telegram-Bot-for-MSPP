@@ -116,8 +116,9 @@ WEBHOOK_URL=https://example.com
  - Запустить локально<br>
   `docker compose -f infra/docker-compose_local.yml up` - с выводом в консоль<br>
   `docker compose -f infra/docker-compose_local.yml up -d` - в тихом режиме<br>
-  `docker compose -f infra/docker-compose_local.yml up --build` - пересобрать после внесения изменений<br>
-  `docker compose -f infra/docker-compose_local.yml up -d --build` - пересобрать в тихом режиме<br>
+  `docker compose -f infra/local/docker-compose.yml up -d` 
+  - пересобрать после внесения изменений<br>
+  `docker compose -f infra/local/docker-compose.yml up -d --build` - пересобрать в тихом режиме<br>
 
   - Создать миграции<br>
   `docker compose -f infra/docker-compose_local.yml exec backend python manage.py migrate`<br>

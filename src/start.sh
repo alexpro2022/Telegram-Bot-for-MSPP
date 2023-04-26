@@ -4,11 +4,11 @@ if [ "$DEBUG"==True ]; then
     python manage.py makemigrations
     python manage.py migrate
     python manage.py fill_data
-    python manage.py collectstatic --noinput
+    python manage.py collectstatic --no-input
 
     if [ "$DJANGO_SUPERUSER_USERNAME" ]; then
         python manage.py createsuperuser \
-            --noinput \
+            --no-input \
             --username $DJANGO_SUPERUSER_USERNAME \
             --email $DJANGO_SUPERUSER_EMAIL
     fi

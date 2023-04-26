@@ -1,0 +1,13 @@
+{% if fund %}
+    <div class="input-field col s12">
+        <input id="fund" name="fund" type="text" disabled>
+        <label for="fund">Фонд: {{ fund }}</label>
+        <span class="helper-text fund"></span>
+    </div>   
+{% else%}
+    <div class="input-field col s12">
+        <input id="fund" name="fund" type="text" class="validate" minlength="2" maximumlength="100" required>
+        <label for="fund">Фонд</label>
+        <span class="helper-text fund"></span>
+    </div> 
+{% endif %}

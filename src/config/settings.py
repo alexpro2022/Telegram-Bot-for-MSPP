@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 from pathlib import Path
 
@@ -13,14 +12,28 @@ env = environ.Env()
 
 SECRET_KEY = env("SECRET_KEY", default=get_random_secret_key())
 
-DEBUG = env.bool("DEBUG", default=True)
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = list(map(str.strip, env.list("ALLOWED_HOSTS", default=["*"])))
-CSRF_TRUSTED_ORIGINS = list(
-    map(str.strip, env.list("CSRF_TRUSTED_ORIGINS", default=["http://127.0.0.1", "http://localhost"]))
-)
-
-# Application definition
+DOMAIN = env("DOMAIN", default="mspp-bot.duckdns.org")
+APPLICATION_URL = f"https://{DOMAIN}"
+ALLOWED_HOSTS = list(map(str.strip, env.list(
+    "ALLOWED_HOSTS",
+    default=['*'])))
+'''        "http://127.0.0.1",
+        'e283-188-170-73-218.eu.ngrok.io',
+        "localhost",
+        "http://localhost",
+        "https://130.193.48.219",
+        APPLICATION_URL,
+    ]))) '''
+CSRF_TRUSTED_ORIGINS = list(map(str.strip, env.list(
+    "CSRF_TRUSTED_ORIGINS",
+    default=[
+        "http://127.0.0.1",
+        "http://localhost",
+        "https://130.193.48.219",
+        APPLICATION_URL,
+    ])))
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -30,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "mptt",
+    "registration",
     "bot.apps.BotConfig",
     "core",
 ]
@@ -49,7 +63,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'templates')],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -64,9 +78,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
-# Use PostgreSQL
-# ------------------------------------------------------------------------------
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -77,6 +88,7 @@ DATABASES = {
         "PORT": env("POSTGRES_PORT", default="5432"),
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -101,45 +113,20 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "static"
-# STATICFILES_DIRS необходимо закомментировать или удалить
-# STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
-
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Telegram
-TELEGRAM_TOKEN = env("TELEGRAM_TOKEN")
-WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
-WEBHOOK_URL = env("WEBHOOK_URL", default=environ.Env.NOTSET if WEBHOOK_MODE else "")
-
-# LOGGING
 LOGGING_LEVEL = env("LOGGING_LEVEL", default="DEBUG")
 LOG_DIR = BASE_DIR / "logs"
 LOGGING_FILENAME = LOG_DIR / "system.log"
 LOGGING_FILENAME_BOT = LOG_DIR / "bot.log"
 FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
-logging.basicConfig(
-    level=LOGGING_LEVEL,
-    filename=LOGGING_FILENAME,
-    filemode="w",
-    format="%(asctime)s %(levelname)s %(message)s",
-)
-
-DJANGO_SUPERUSER_PASSWORD = env("DJANGO_SUPERUSER_PASSWORD")
-DJANGO_SUPERUSER_EMAIL = env("DJANGO_SUPERUSER_EMAIL")
-DJANGO_SUPERUSER_USERNAME = env("DJANGO_SUPERUSER_USERNAME")
-
-# Google date
-
-# PROJECT_ID = env("PROJECT_ID")
-# PRIVATE_KEY_ID = env("PRIVATE_KEY_ID")
-# PRIVATE_KEY =
-# CLIENT_EMAIL = env("CLIENT_EMAIL")
-# CLIENT_ID = env("CLIENT_ID")
-# CLIENT_X509_CERT_URL = env("CLIENT_X509_CERT_URL")
-
+TELEGRAM_TOKEN = env("TELEGRAM_TOKEN", default="")
+WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
+WEBHOOK_URL = env("WEBHOOK_URL", default=environ.Env.NOTSET if WEBHOOK_MODE else "")
 
 # Google
 CREDENTIALS_TYPE = env("CREDENTIALS_TYPE", default="env")
@@ -147,32 +134,36 @@ SPREADSHEETS_URL = "https://docs.google.com/spreadsheets/d/{0}"
 SPREADSHEET_ID = env("SPREADSHEET_ID", default="_")
 SCOPES = ("https://www.googleapis.com/auth/spreadsheets",)
 
-EMAIL_USER = env("EMAIL", default="example@mail.com")
+GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/d/e/{0}/formResponse"
+GOOGLE_FORM_ID = "1FAIpQLSdyfRyOfDfB3X75eEQoTOgBA8bGfe68Lthy-03EdwnnE_U9QA"
+GOOGLE_FORM_FIELDS = {
+    "surname": "50190039",
+    "first_name": "1395634080",
+    "patronymic": "864793007",
+    "age": "905514263",
+    "country": "16057190",
+    "region": "1475908288",
+    "city": "969207866",
+    "job": "1848219250",
+    "email": "894713360",
+    "phone": "1686121456",
+    "fund_name": "802736698",
+}
 
+EMAIL_USER = env("EMAIL", default="example@mail.com")
 PRIVATE_KEY = env.str("PRIVATE_KEY", multiline=True, default="_")
 ENV_INFO = {
     "project_id": env("PROJECT_ID", default="_"),
     "private_key_id": env("PRIVATE_KEY_ID", default="_"),
-    "private_key": env("PRIVATE_KEY"),
+    "private_key": PRIVATE_KEY,
     "client_email": env("CLIENT_EMAIL", default="_"),
     "client_id": env("CLIENT_ID", default="_"),
     "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
 }
 
-WEBAPP_HTML = env(
-    "WEBAPP_HTML",
-    default="https://docs.python-telegram-bot.org/en/stable/examples.webappbot.html",
+logging.basicConfig(
+    level=LOGGING_LEVEL,
+    filename=LOGGING_FILENAME,
+    filemode="w",
+    format="%(asctime)s %(levelname)s %(message)s",
 )
-
-# APPLICATION_URL = env("APPLICATION_URL", default='130.193.48.219')
-# RELATIVE_URL = "bot/registration/"
-# WEBAPP_URL = env("WEBAPP_URL", default=urljoin(APPLICATION_URL, RELATIVE_URL))
-
-USER_DATA = {}
-
-
-class PRE_FILL_DATA:
-    age: str
-    fund: str
-    region: str = " "
-    city: str = " "

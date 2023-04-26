@@ -5,7 +5,6 @@ from mptt.models import MPTTModel, TreeForeignKey, TreeManyToManyField
 class BaseModel(models.Model):
     """
     An abstract base class model.
-
     It provides self-updating ``created_at`` and ``updated_at`` fields.
     """
 
@@ -48,7 +47,6 @@ class CoverageArea(MPTTModel, BaseModel):
 class AgeLimit(BaseModel):
     """
     AgeLimit class model.
-
     It provides ``from_age`` and ``to_age`` fields.
     """
 
