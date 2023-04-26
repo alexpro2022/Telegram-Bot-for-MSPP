@@ -45,7 +45,7 @@ async def read_web_app(
     # and get the final confirmation
     add_backwards(context, "fund")
     text, keyboard = controls.get_confirmation(context.user_data)
-    await bot_send_data(update, text, keyboard)
+    return await bot_send_data(update, text, keyboard)
 
 
 async def send_to_google(

@@ -95,20 +95,20 @@ def get_application_started():
 
 
 def get_confirmation(data: dict):
-    KEY_ERROR_MESSAGE = "Test data"
+    key_error_mesage = "Test data"
     text = s.BOT_SPEAKING + (
         f"Твои данные будут отправлены:\n\n"
-        f"Фамилия:      {data.get('surname', KEY_ERROR_MESSAGE)}\n"
-        f"Имя:          {data.get('name', KEY_ERROR_MESSAGE)}\n"
-        f"Отчество:     {data.get('patronimic', KEY_ERROR_MESSAGE)}\n"
-        f"Возраст:      {data.get('age', KEY_ERROR_MESSAGE)}\n"
+        f"Фамилия:      {data.get('surname', key_error_mesage)}\n"
+        f"Имя:          {data.get('name', key_error_mesage)}\n"
+        f"Отчество:     {data.get('patronimic', key_error_mesage)}\n"
+        f"Возраст:      {data.get('age', key_error_mesage)}\n"
         f"Регион:       {data.get('region', 'Нет региона')}\n"
         f"Город:        {data.get('city', 'Нет города')}\n"
-        f"Локация:      {data.get('location', KEY_ERROR_MESSAGE)}\n"
-        f"Профессия:    {data.get('occupation', KEY_ERROR_MESSAGE)}\n"
-        f"E-mail:       {data.get('email', KEY_ERROR_MESSAGE)}\n"
-        f"Телефон:      {data.get('phone_number', KEY_ERROR_MESSAGE)}\n"
-        f"Фонд:         {data.get('fund', KEY_ERROR_MESSAGE)}\n\n"
+        f"Локация:      {data.get('location', key_error_mesage)}\n"
+        f"Профессия:    {data.get('occupation', key_error_mesage)}\n"
+        f"E-mail:       {data.get('email', key_error_mesage)}\n"
+        f"Телефон:      {data.get('phone_number', key_error_mesage)}\n"
+        f"Фонд:         {data.get('fund', key_error_mesage)}\n\n"
     )
     footer = [
         get_args_back("Изменить фонд", cbq.GET_FUND),
