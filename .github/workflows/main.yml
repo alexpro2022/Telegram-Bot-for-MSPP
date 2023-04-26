@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install \
-            -r requirements/development.txt \
+            -r requirements/production.txt \
             flake8 pep8-naming \
             flake8-broken-line \
             flake8-return \
