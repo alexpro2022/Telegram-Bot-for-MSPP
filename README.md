@@ -1,4 +1,4 @@
-[![MSPP Actions Status](https://github.com/Studio-Yandex-Practicum/mspp/actions/workflows/stage_deploy.yaml/badge.svg)](https://github.com/Studio-Yandex-Practicum/mspp/actions)
+[![MSPP CI/CD](https://github.com/alexpro2022/Telegram-Bot-for-MSPP/actions/workflows/main.yml/badge.svg)](https://github.com/alexpro2022/Telegram-Bot-for-MSPP/actions/workflows/main.yml)
 # mspp
 
 ## Описание
