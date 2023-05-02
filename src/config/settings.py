@@ -1,6 +1,7 @@
 import logging
 import sys
 from pathlib import Path
+from urllib.parse import urljoin
 
 import environ
 from django.core.management.utils import get_random_secret_key
@@ -14,26 +15,11 @@ SECRET_KEY = env("SECRET_KEY", default=get_random_secret_key())
 
 DEBUG = env.bool("DEBUG", default=True)
 
-DOMAIN = env("DOMAIN", default="mspp-bot.duckdns.org")
-APPLICATION_URL = f"https://{DOMAIN}"
-ALLOWED_HOSTS = list(map(str.strip, env.list(
-    "ALLOWED_HOSTS",
-    default=['*'])))
-'''        "http://127.0.0.1",
-        'e283-188-170-73-218.eu.ngrok.io',
-        "localhost",
-        "http://localhost",
-        "https://130.193.48.219",
-        APPLICATION_URL,
-    ]))) '''
-CSRF_TRUSTED_ORIGINS = list(map(str.strip, env.list(
-    "CSRF_TRUSTED_ORIGINS",
-    default=[
-        "http://127.0.0.1",
-        "http://localhost",
-        "https://130.193.48.219",
-        APPLICATION_URL,
-    ])))
+PROTO = "https://"
+DOMAIN = env("DOMAIN").replace(PROTO, "")
+ALLOWED_HOSTS = [DOMAIN]
+APPLICATION_URL = f"{PROTO}{DOMAIN}"
+CSRF_TRUSTED_ORIGINS = [APPLICATION_URL]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -119,14 +105,11 @@ STATIC_ROOT = BASE_DIR / "static"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Telegram
-LOGGING_LEVEL = env("LOGGING_LEVEL", default="DEBUG")
-LOG_DIR = BASE_DIR / "logs"
-LOGGING_FILENAME = LOG_DIR / "system.log"
-LOGGING_FILENAME_BOT = LOG_DIR / "bot.log"
-FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
-TELEGRAM_TOKEN = env("TELEGRAM_TOKEN", default="")
+TELEGRAM_TOKEN = env("TELEGRAM_BOT_TOKEN", default="")
 WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
-WEBHOOK_URL = env("WEBHOOK_URL", default=environ.Env.NOTSET if WEBHOOK_MODE else "")
+WEBHOOK_URL = APPLICATION_URL
+# WEBHOOK_URL = env("WEBHOOK_URL", default=environ.Env.NOTSET if WEBHOOK_MODE else "")
+WEBHOOK_URL = urljoin(APPLICATION_URL, "bot/")
 
 # Google
 CREDENTIALS_TYPE = env("CREDENTIALS_TYPE", default="env")
@@ -161,9 +144,15 @@ ENV_INFO = {
     "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
 }
 
+LOGGING_LEVEL = env("LOGGING_LEVEL", default="DEBUG")
+LOG_DIR = BASE_DIR / "logs"
+LOGGING_FILENAME = LOG_DIR / "system.log"
+LOGGING_FILENAME_BOT = LOG_DIR / "bot.log"
+FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
 logging.basicConfig(
     level=LOGGING_LEVEL,
     filename=LOGGING_FILENAME,
     filemode="w",
     format="%(asctime)s %(levelname)s %(message)s",
 )
+

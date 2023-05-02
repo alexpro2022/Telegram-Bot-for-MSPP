@@ -1,172 +1,187 @@
-[![MSPP CI/CD](https://github.com/alexpro2022/Telegram-Bot-for-MSPP/actions/workflows/main.yml/badge.svg)](https://github.com/alexpro2022/Telegram-Bot-for-MSPP/actions/workflows/main.yml)
-# mspp
-
-## Описание
+# Проект MSPP: 
 Бот для «Московской школы профессиональной филантропии»
+[![MSPP CI/CD](https://github.com/alexpro2022/Telegram-Bot-for-MSPP/actions/workflows/main.yml/badge.svg)](https://github.com/alexpro2022/Telegram-Bot-for-MSPP/actions/workflows/main.yml)
 
 
-## Ключевые технологии и библиотеки:
-- [Python](https://www.python.org/): 3.11
-- [Django](https://www.djangoproject.com/): 4.1.5
+
+## Оглавление:
+- [Технологии](#технологии)
+- [Описание работы](#описание-работы)
+- [Создание и настройка аккаунта бота](#Создание-и-настройка-аккаунта-бота)
+- [Установка и запуск](#установка-и-запуск)
+- [Активация бота](#активация-бота)
+- [Автор](#автор)
 
 
-## Шаблон наполнения env-файла
 
-<details>
-  <summary>env_example</summary>
+## Технологии:
 
-  - Обязательно<br>
-  `TELEGRAM_TOKEN`<br>
-  `PostgreSQL environment variables`<br>
-  - Остальное опционально.<br>
-    - Django<br>
-    `ALLOWED_HOSTS=[]`<br>
-    `CSRF_TRUSTED_ORIGINS=[]`<br>
-    `DEBUG=True`<br>
-    `SECRET_KEY=""`<br>
-    - Telegram<br>
-    `TELEGRAM_TOKEN=`<br>
-    `WEBHOOK_MODE=False`<br>
-    `WEBHOOK_URL=`<br>
-    - Google<br>
-    `LOGGING_LEVEL="DEBUG"`<br>
-    `EMAIL="example@mail.com"`<br>
-    - ID Google таблицы для добавления данных<br>
-    `SPREADSHEET_ID=""`<br>
-    - Данные сервисного аккаунта<br>
-    `PROJECT_ID=""`<br>
-    `PRIVATE_KEY_ID=""`<br>
-    `PRIVATE_KEY=""`<br>
-    `CLIENT_EMAIL=""`<br>
-    `CLIENT_ID=""`<br>
-    `CLIENT_X509_CERT_URL=""`<br>
-    - PostgreSQL environment variables<br>
-    `POSTGRES_DB=mspp`<br>
-    `POSTGRES_USER=mspp`<br>
-    `POSTGRES_PASSWORD=pg_password`<br>
-    `POSTGRES_HOST=postgres`<br>
-    `POSTGRES_PORT=5432`<br>
-  ---
-</details>
 
-## Установка
-1. Зависимости и пакеты управляются через **poetry**. Убедитесь, что **poetry** [установлен](https://python-poetry.org/docs/#osx--linux--bashonwindows-install-instructions) на вашем компьютере и ознакомьтесь с [документацией](https://python-poetry.org/docs/cli/).
-2. Активируйте виртуальное окружение.
-    ```bash
-    poetry shell
+**Языки программирования, библиотеки и модули:**
+
+[![Python](https://img.shields.io/badge/python-3.11-blue?logo=python)](https://www.python.org/)
+
+[![HTML](https://img.shields.io/badge/-HTML-464646?logo=html)](https://html.spec.whatwg.org/multipage/)
+[![JavaScript](https://img.shields.io/badge/-JavaScript-464646?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+
+
+**Фреймворк, расширения и библиотеки:**
+
+[![Django](https://img.shields.io/badge/-Django-464646?logo=Django)](https://www.djangoproject.com/)
+
+
+**CI/CD:**
+
+[![GitHub_Actions](https://img.shields.io/badge/-GitHub_Actions-464646?logo=GitHub)](https://docs.github.com/en/actions)
+[![docker_hub](https://img.shields.io/badge/-Docker_Hub-464646?logo=docker)](https://hub.docker.com/)
+[![docker_compose](https://img.shields.io/badge/-Docker%20Compose-464646?logo=docker)](https://docs.docker.com/compose/)
+[![Nginx](https://img.shields.io/badge/-NGINX-464646?logo=NGINX)](https://nginx.org/ru/)
+[![Yandex.Cloud](https://img.shields.io/badge/-Yandex.Cloud-464646?logo=Yandex)](https://cloud.yandex.ru/)
+[![Telegram](https://img.shields.io/badge/-Telegram-464646?logo=Telegram)](https://core.telegram.org/api)
+
+[⬆️Оглавление](#оглавление)
+
+
+
+## Описание работы:
+Add your description here
+
+[⬆️Оглавление](#оглавление)
+
+
+
+## Создание и настройка аккаунта бота:
+1. @BotFather — регистрирует аккаунты ботов в Telegram:
+
+Найдите в Telegram бота @BotFather: в окно поиска над списком контактов введите его имя.
+Обратите внимание на иконку возле имени бота: белая галочка на голубом фоне. Эту иконку устанавливают администраторы Telegram, она означает, что бот настоящий, а не просто носит похожее имя. В любой непонятной ситуации выполняйте команду /help — и @BotFather покажет вам, на что он способен.
+
+2. Создание аккаунта бота:
+
+Начните диалог с ботом @BotFather: нажмите кнопку Start («Запустить»). Затем отправьте команду /newbot и укажите параметры нового бота:
+   * имя (на любом языке), под которым ваш бот будет отображаться в списке контактов;
+   * техническое имя вашего бота, по которому его можно будет найти в Telegram. Имя должно оканчиваться на слово bot в любом регистре. Имена ботов должны быть уникальны.
+
+Аккаунт для вашего бота создан! 
+@BotFather поздравит вас и отправит в чат токен для работы с Bot API. Токен выглядит примерно так: `123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11`. По вашему запросу @BotFather может отозвать токен (отправьте боту @BotFather команду /revoke) и сгенерировать новый.
+
+3. Настройка аккаунта бота:
+Настроить аккаунт бота можно через @BotFather.
+Отправьте команду /mybots; в ответ вы получите список ботов, которыми вы управляете (возможно, в этом списке лишь один бот). Укажите бота, которого хотите отредактировать, и нажмите кнопку Edit Bot.
+Вы сможете изменить:
+   * Имя бота (Edit Name).
+   * Описание (Edit Description) — текст, который пользователи увидят в самом начале диалога с ботом под заголовком «Что может делать этот бот?»
+   * Общую информацию (Edit About) — текст, который будет виден в профиле бота.
+   * Картинку-аватар (Edit Botpic).
+   * Команды (Edit Commands) — подсказки для ввода команд.
+
+[⬆️Оглавление](#оглавление)
+
+
+
+## Установка и запуск:
+Удобно использовать copy-paste - команды копировать из GitHub Readme и вставить в командную строку Git Bash или IDE (например VSCode).
+### Предварительные условия:
+Предполагается, что пользователь:
+  - создал [бота](#Создание-и-настройка-аккаунта-бота)
+  - создал [сервисный аккаунт](https://support.google.com/a/answer/7378726?hl=en) на платформе Google Cloud и получил JSON-файл с информацией о своем сервисном аккаунте, его приватный ключ, ID и ссылки для авторизации. Эти данные будет необходимо указать в файле переменных окружения.
+  - установил [Docker](https://docs.docker.com/engine/install/) и [Docker Compose](https://docs.docker.com/compose/install/) на локальной машине или на удаленном сервере, где проект будет запускаться в контейнерах. Проверить наличие можно выполнив команды:
     ```
-3. Установите зависимости.
-    ```bash
-    poetry install
+    docker --version && docker-compose --version
     ```
-4. Установите pre-commit хуки
-    ```bash
-    pre-commit install --all
-    ```
+  - создал аккаунт [DockerHub](https://hub.docker.com/), если запуск будет производится на удаленном сервере.
+<hr>
+<details><summary>Локальный запуск: Docker Compose</summary> 
 
-При каждом коммите выполняются хуки (автоматизации) перечисленные в **.pre-commit-config.yaml**. [Документация pre-commit](https://pre-commit.com)
-Если не понятно какая ошибка мешает сделать коммит можно запустить хуки вручную и посмотреть ошибки:
-    ```bash
-    pre-commit run --all-files
-    ```
-## Режим работы бота
-### Polling
-Для запуска бота в режиме polling задайте в файле .env значение `False` для константы `WEBHOOK_MODE`
+**!!! Для пользователей Windows обязательно выполнить команду:** иначе файл start.sh при клонировании будет бракован:
 ```
-WEBHOOK_MODE=False
+git config --global core.autocrlf false
 ```
 
-### Webhook
-Для запуска бота в режиме webhook задайте в файле .env значение `True` для константы `WEBHOOK_MODE`, также необходимо указать URL сайта, на котором развернут проект, в константе `WEBHOOK_URL`
+1. Установите [ngrok](https://ngrok.com/download) и активируйте тоннель для https соединения. В поле Forwarding первым элементом будет указано значение вида `https://ebd6-188-170-76-51.ngrok-free.app`, которое необходимо указать в переменной окружения DOMAIN (можно как с протоколом https:// , так и без него) (см. п.2)
+
+2. Клонируйте репозиторий с GitHub и в .env-файле введите данные для переменных окружения (значения даны для примера, но их можно оставить; подсказки даны в комментариях):
+```
+git clone git@github.com:alexpro2022/Telegram-Bot-for-MSPP.git && \
+cd Telegram-Bot-for-MSPP && \
+cp env_example .env && \
+nano .env
+```
+Для работы бота необходимо задать значения минимум трем переменным окружения: TELEGRAM_BOT_TOKEN, DOMAIN, WEBHOOK_MODE.
+По умолчанию режим работы бота - polling. Этот режим удобен для первоначальной отладки бота, но в дальнейшем придется перейти на режим работы - webhook. Для этого задайте значение:
 ```
 WEBHOOK_MODE=True
-WEBHOOK_URL=https://example.com
 ```
 
-<details>
-  <summary>Локальный запуск webhook</summary>
+3. Из корневой директории проекта выполните команду:
+```
+docker compose -f infra/local/docker-compose.yml up -d --build
+```
+Проект будет развернут в трех docker-контейнерах (db, web, nginx) по адресу http://localhost.
 
-  Для локального запуска бота в режиме webhook можно использовать приложение [ngrok](https://ngrok.com/)
+4. Остановить docker и удалить контейнеры можно командой из корневой директории проекта:
+```
+docker compose -f infra/local/docker-compose.yml down
+```
+Если также необходимо удалить тома базы данных, статики и медиа:
+```
+docker compose -f infra/local/docker-compose.yml down -v
+```
+</details></details>
+<hr>
+<details><summary>Запуск на удаленном сервере: Docker Compose</summary>
 
-  1. [Скачать](https://ngrok.com/download) и установить ngrok<br>
-  2. [Зарегистрировать](https://dashboard.ngrok.com/signup) учетную запись<br>
-  3. [Авторизоваться](https://dashboard.ngrok.com/login)
-  4. В термминале перейти в папку с ngrok
-  5. Скопировать и выполнить в терминале команду для добавления в ngrok токена авторизации (https://dashboard.ngrok.com/get-started/setup, пункт Connect your account)
-  ```bash
-  ngrok config add-authtoken <ваш_токен>
-  ```
-  6. Запустить ngrok в терминале
-  ```bash
-  ngrok http 8000
-  ```
-  7. Из ngrok cкопировать url из поля `Forwarding` в константу `WEBHOOK_URL` файла .env
-</details>
+1. Создайте [домен](https://www.duckdns.org/domains) и привяжите его к публичному IP-адресу вашего удаленного сервера (введите его в поле current ip).
 
+2. Сделайте [форк](https://docs.github.com/en/get-started/quickstart/fork-a-repo) в свой репозиторий.
 
-## Локальный запуск
+3. Создайте Actions.Secrets согласно списку ниже (значения указаны для примера) + переменные окружения из env_example файла:
+```
+PROJECT_NAME=mspp-bot
+SECRET_KEY
 
-<details>
-  <summary>Запуск в docker'е</summary>
+DOCKERHUB_USERNAME
+DOCKERHUB_PASSWORD
 
-  ---
-  [Установить](https://docs.docker.com/engine/install/) docker и docker compose<br>
-  Добавить TELEGRAM_TOKEN в .env_local<br>
+# Данные удаленного сервера и ssh-подключения:
+HOST  # публичный IP-адрес вашего удаленного сервера
+USERNAME
+SSH_KEY
+PASSPHRASE
+DOMAIN=mspp-bot.duckdns.org   
 
- - Запустить локально<br>
-  `docker compose -f infra/docker-compose_local.yml up` - с выводом в консоль<br>
-  `docker compose -f infra/docker-compose_local.yml up -d` - в тихом режиме<br>
-  `docker compose -f infra/local/docker-compose.yml up -d` 
-  - пересобрать после внесения изменений<br>
-  `docker compose -f infra/local/docker-compose.yml up -d --build` - пересобрать в тихом режиме<br>
+# Учетные данные Телеграм-бота для получения сообщения о успешном завершении workflow:
+TELEGRAM_USER_ID
+TELEGRAM_BOT_TOKEN
 
-  - Создать миграции<br>
-  `docker compose -f infra/docker-compose_local.yml exec backend python manage.py migrate`<br>
-
-  - Создать суперпользователя<br>
-  `docker compose -f infra/docker-compose_local.yml exec backend python manage.py createsuperuser`<br>
-
-  - Собрать статику<br>
-  `docker compose -f infra/docker-compose_local.yml exec backend python manage.py collectstatic --no-input`<br>
-
-  - Остановить<br>
-  `docker compose -f infra/docker-compose_local.yml down` - остановить и удалить контейнеры<br>
-  `docker compose -f infra/docker-compose_local.yml down -v` - остановить и удалить все кроме образов<br>
-
-  - Удалить volumes<br>
-  `docker volume rm postgres_data_local` - БД<br>
-  `docker volume rm static_value_local` - статика<br>
-
-  - Удалить образы<br>
-  `docker image rm mspp` - образ приложения<br>
-  `docker image rm postgres:15.2` - postgres<br>
-  `docker image rm nginx:1.23.3-alpine` - nginx<br>
-  ---
-</details>
-<details>
-  <summary>Запуск uvicorn</summary>
-
-  ---
-  1. Перейдите в директорию src `cd src`
-  2. Скопируйте статические файлы `python manage.py collectstatic`
-  3. Примените миграции `python manage.py migrate`
-  4. Создайте суперпользователя `python manage.py createsuperuser`
-  5. Запустите проект `uvicorn config.asgi:application`
-  ---
-</details>
-
-
-## Команда для заполнения базы тестовыми данными
-```bash
-python manage.py fill_data
+# База данных:
+DB_ENGINE=django.db.backends.postgresql
+DB_HOST=db
+DB_NAME=postgres
+DB_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=12345
 ```
 
-### Авторы:
+4. Запустите вручную workflow, чтобы автоматически развернуть проект в трех docker-контейнерах (db, web, nginx) на удаленном сервере.
+</details>
+<hr>
 
-[Anton Zelinsky](https://github.com/AntonZelinsky)<br>
-[kr0t](https://github.com/kr0t)<br>
-<br>
-[AlexGriv](https://github.com/AlexGriv)<br>
-[Serge Balyaba](https://github.com/erges699)<br>
-[Nikita Troshkin](https://github.com/Esedess)<br>
-[ivanyuk-vl](https://github.com/ivanyuk-vl)
+[⬆️Оглавление](#оглавление)
+
+
+
+## Активация бота:
+
+Найдите своего бота по имени через поисковую строку — в окно поиска над списком контактов введите его имя. Напишите сообщение `/start`, чтобы активировать его: теперь он сможет отправлять вам сообщения. Точно так же активировать вашего бота может любой, кто его найдёт.
+
+[⬆️Оглавление](#оглавление)
+
+
+
+## Автор:
+[Aleksei Proskuriakov](https://github.com/alexpro2022)
+
+[⬆️В начало](#Проект)
+
+

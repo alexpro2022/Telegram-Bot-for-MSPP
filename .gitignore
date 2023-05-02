@@ -109,7 +109,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-.env_local
 
 # Spyder project settings
 .spyderproject
@@ -150,5 +149,6 @@ dmypy.json
 *.code-workspace
 Makefile
 __*
-.env_local
 =GARB=
+logs/
+

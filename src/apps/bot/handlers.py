@@ -1,3 +1,5 @@
+from urllib.parse import urljoin
+
 from django.conf import settings
 from django.urls import reverse
 from telegram import Update
@@ -127,8 +129,8 @@ async def get_application_started(
 # === WebApp ============================================================================================
 async def get_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
     age = context.user_data.get(s.AGE)
-    webapp_url_new_fund = f"https://{settings.DOMAIN}{reverse('new_fund', args=[age])}"
-    await webapp(update, context, webapp_url_new_fund)
+    url = urljoin(settings.APPLICATION_URL, reverse('new_fund', args=[age]))
+    await webapp(update, context, url)
 
 
 async def get_new_user_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -136,8 +138,8 @@ async def get_new_user_form(update: Update, context: ContextTypes.DEFAULT_TYPE):
     region = context.user_data.get(s.REGION, ' ')
     city = context.user_data.get(s.CITY, ' ')
     fund = context.user_data.get(s.FUND)
-    webapp_url_user = f"https://{settings.DOMAIN}{reverse('new_user', args=[age, region, city, fund])}"
-    await webapp(update, context, webapp_url_user)
+    url = urljoin(settings.APPLICATION_URL, reverse('new_user', args=[age, region, city, fund]))
+    await webapp(update, context, url)
 
 
 async def read_webapp_send_to_google(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

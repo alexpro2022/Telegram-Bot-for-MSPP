@@ -1,9 +1,7 @@
-from urllib.parse import urljoin
+from django.conf import settings
 
 from telegram.error import TelegramError
 from telegram.ext import Application
-
-import config.settings as settings
 
 from .handlers import HANDLERS
 from .logger import logger
@@ -16,7 +14,7 @@ async def start_bot():
     try:
         await bot_app.initialize()
         if settings.WEBHOOK_MODE:
-            await bot_app.bot.set_webhook(urljoin(settings.WEBHOOK_URL, "bot/"))
+            await bot_app.bot.set_webhook(settings.WEBHOOK_URL)
         else:
             await bot_app.updater.start_polling()
         await bot_app.start()
