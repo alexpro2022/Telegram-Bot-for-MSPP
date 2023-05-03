@@ -108,7 +108,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 TELEGRAM_TOKEN = env("TELEGRAM_BOT_TOKEN", default="")
 WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
 WEBHOOK_URL = APPLICATION_URL
-# WEBHOOK_URL = env("WEBHOOK_URL", default=environ.Env.NOTSET if WEBHOOK_MODE else "")
 WEBHOOK_URL = urljoin(APPLICATION_URL, "bot/")
 
 # Google

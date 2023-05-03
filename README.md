@@ -11,7 +11,7 @@
 - [Создание и настройка аккаунта бота](#Создание-и-настройка-аккаунта-бота)
 - [Установка и запуск](#установка-и-запуск)
 - [Активация бота](#активация-бота)
-- [Автор](#автор)
+- [Авторы](#авторы)
 
 
 
@@ -20,15 +20,21 @@
 
 **Языки программирования, библиотеки и модули:**
 
-[![Python](https://img.shields.io/badge/python-3.11-blue?logo=python)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-v3.11-blue?logo=python)](https://www.python.org/)
+[![python-telegram-bot](https://img.shields.io/badge/python--telegram--bot-v20.1-blue?)](https://docs.python-telegram-bot.org/en/stable/index.html)
+[![asyncio](https://img.shields.io/badge/-asyncio-464646?logo=sqlalchemy)](https://docs.python.org/3/library/asyncio.html)
+[![logging](https://img.shields.io/badge/-logging-464646?logo=python)](https://docs.python.org/3/library/logging.html)
+[![typing](https://img.shields.io/badge/-typing-464646)](https://docs.python.org/3/library/typing.html)
 
 [![HTML](https://img.shields.io/badge/-HTML-464646?logo=html)](https://html.spec.whatwg.org/multipage/)
+[![CSS](https://img.shields.io/badge/-CSS_selectors-464646?logo=CSS)](https://developer.mozilla.org/ru/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/-JavaScript-464646?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 
 **Фреймворк, расширения и библиотеки:**
 
-[![Django](https://img.shields.io/badge/-Django-464646?logo=Django)](https://www.djangoproject.com/)
+[![Django](https://img.shields.io/badge/Django-v4.1-blue?logo=Django)](https://www.djangoproject.com/)
+[![mptt](https://img.shields.io/badge/-mptt-464646?logo=django)](https://django-mptt.readthedocs.io/en/latest/)
 
 
 **CI/CD:**
@@ -40,6 +46,13 @@
 [![SWAG](https://img.shields.io/badge/-SWAG-464646?logo=swag)](https://docs.linuxserver.io/general/swag)
 [![Yandex.Cloud](https://img.shields.io/badge/-Yandex.Cloud-464646?logo=Yandex)](https://cloud.yandex.ru/)
 [![Telegram](https://img.shields.io/badge/-Telegram-464646?logo=Telegram)](https://core.telegram.org/api)
+
+
+**Облачные технологии:**
+
+[![Google](https://img.shields.io/badge/-Google_Cloud_Drive-464646?logo=google)](https://developers.google.com/drive)
+[![Google](https://img.shields.io/badge/-Google_Cloud_Sheets-464646?logo=google)](https://developers.google.com/sheets)
+[![Aiogoogle](https://img.shields.io/badge/-Aiogoogle-464646?logo=google)](https://aiogoogle.readthedocs.io/en/latest/)
 
 [⬆️Оглавление](#оглавление)
 
@@ -176,6 +189,16 @@ POSTGRES_PASSWORD=12345
 </details>
 <hr>
 
+При первом запуске будут автоматически произведены следующие действия:    
+  * выполнены миграции БД
+  * БД заполнена начальными данными
+  * создан суперюзер (пользователь с правами админа) с учетными данными из переменных окружения DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD.
+  * собрана статика
+
+Вход в админ-зону осуществляется по адресу: http://hostname/admin/ , где hostname:
+  * localhost
+  * IP-адрес удаленного сервера  (DOMAIN ???)
+
 [⬆️Оглавление](#оглавление)
 
 
@@ -188,7 +211,9 @@ POSTGRES_PASSWORD=12345
 
 
 
-## Автор:
+## Авторы:
+
+[Studio Yandex Practicum](https://github.com/Studio-Yandex-Practicum/mspp#%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D1%8B)
 [Aleksei Proskuriakov](https://github.com/alexpro2022)
 
 [⬆️В начало](#Проект-MSPP)
