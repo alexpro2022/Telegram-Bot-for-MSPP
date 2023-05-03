@@ -25,10 +25,9 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      - URL=mspp-bot.duckdns.org
+      - URL=${DOMAIN}
       - VALIDATION=http
       - CERTPROVIDER=zerossl
-      - EMAIL=yandex-practicum@yandex.ru
     volumes:
       - ./swag.conf:/config/nginx/site-confs/default.conf
       - static_value:/var/html/static/
@@ -36,6 +35,8 @@ services:
       - 443:443
       - 80:80
     restart: unless-stopped
+    env_file:
+      - ./.env    
 
 volumes:
   postgres_data:
