@@ -17,7 +17,7 @@ DEBUG = env.bool("DEBUG", default=True)
 
 PROTO = "https://"
 DOMAIN = env("DOMAIN").replace(PROTO, "")
-ALLOWED_HOSTS = [DOMAIN]
+ALLOWED_HOSTS = [DOMAIN, 'localhost']
 APPLICATION_URL = f"{PROTO}{DOMAIN}"
 CSRF_TRUSTED_ORIGINS = [APPLICATION_URL]
 

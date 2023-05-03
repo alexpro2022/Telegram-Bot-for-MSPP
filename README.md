@@ -22,19 +22,25 @@
 
 [![Python](https://img.shields.io/badge/Python-v3.11-blue?logo=python)](https://www.python.org/)
 [![python-telegram-bot](https://img.shields.io/badge/python--telegram--bot-v20.1-blue?)](https://docs.python-telegram-bot.org/en/stable/index.html)
-[![asyncio](https://img.shields.io/badge/-asyncio-464646?logo=sqlalchemy)](https://docs.python.org/3/library/asyncio.html)
-[![logging](https://img.shields.io/badge/-logging-464646?logo=python)](https://docs.python.org/3/library/logging.html)
-[![typing](https://img.shields.io/badge/-typing-464646)](https://docs.python.org/3/library/typing.html)
+[![asyncio](https://img.shields.io/badge/-asyncio-464646?logo=)](https://docs.python.org/3/library/asyncio.html)
+[![logging](https://img.shields.io/badge/-logging-464646?logo=)](https://docs.python.org/3/library/logging.html)
+[![typing](https://img.shields.io/badge/-typing-464646?logo=)](https://docs.python.org/3/library/typing.html)
+[![Uvicorn](https://img.shields.io/badge/-Uvicorn-464646?logo=Uvicorn)](https://www.uvicorn.org/)
 
-[![HTML](https://img.shields.io/badge/-HTML-464646?logo=html)](https://html.spec.whatwg.org/multipage/)
-[![CSS](https://img.shields.io/badge/-CSS_selectors-464646?logo=CSS)](https://developer.mozilla.org/ru/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/-JavaScript-464646?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![HTML](https://img.shields.io/badge/-HTML-464646?logo=html)](https://html.spec.whatwg.org/multipage/)
+[![CSS](https://img.shields.io/badge/-CSS-464646?logo=CSS)](https://developer.mozilla.org/ru/docs/Web/CSS)
 
 
 **Фреймворк, расширения и библиотеки:**
 
 [![Django](https://img.shields.io/badge/Django-v4.1-blue?logo=Django)](https://www.djangoproject.com/)
 [![mptt](https://img.shields.io/badge/-mptt-464646?logo=django)](https://django-mptt.readthedocs.io/en/latest/)
+
+
+**База данных:**
+
+[![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-464646?logo=PostgreSQL)](https://www.postgresql.org/)
 
 
 **CI/CD:**
@@ -197,7 +203,7 @@ POSTGRES_PASSWORD=12345
 
 Вход в админ-зону осуществляется по адресу: http://hostname/admin/ , где hostname:
   * localhost
-  * IP-адрес удаленного сервера  (DOMAIN ???)
+  * Доменное имя удаленного сервера, например mspp-bot.duckdns.org
 
 [⬆️Оглавление](#оглавление)
 
@@ -214,6 +220,7 @@ POSTGRES_PASSWORD=12345
 ## Авторы:
 
 [Studio Yandex Practicum](https://github.com/Studio-Yandex-Practicum/mspp#%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D1%8B)
+
 [Aleksei Proskuriakov](https://github.com/alexpro2022)
 
 [⬆️В начало](#Проект-MSPP)
