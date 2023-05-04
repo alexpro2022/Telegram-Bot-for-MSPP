@@ -3,19 +3,17 @@ import json
 from telegram import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, WebAppInfo
 from telegram.ext import ContextTypes, ConversationHandler
 
-from apps.bot import bot_settings as s
 from apps.bot import controls
+from apps.bot.bot_settings import emoji
 from apps.bot.utils import add_backwards, bot_send_data
-
-cbq = s.CallbackQueries
 
 
 async def webapp(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     url: str,
-    message_text: str = "Нажми на кнопку ниже, чтобы заполнить анкету",
-    button_text: str = "Заполнить анкету",
+    message_text: str = "Нажми на кнопку ниже, чтобы заполнить анкету" + emoji.PRESS_BUTTON,
+    button_text: str = "Заполнить анкету " + emoji.WRITING_HAND,
 ) -> None:
     await update.callback_query.answer()
     await update.callback_query.delete_message()
@@ -44,8 +42,8 @@ async def read_web_app(
         context.user_data[key] = data[key]
     # and get the final confirmation
     add_backwards(context, "fund")
-    text, keyboard = controls.get_confirmation(context.user_data)
-    return await bot_send_data(update, text, keyboard)
+    return await bot_send_data(
+        update, *controls.get_confirmation(context.user_data))
 
 
 async def send_to_google(
