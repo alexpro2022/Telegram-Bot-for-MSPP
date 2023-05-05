@@ -1,10 +1,7 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message, ReplyKeyboardRemove, Update
 from telegram.ext import ContextTypes
 
 from .bot_settings import cbq, constants, emoji
-
-
-username = "To be implemented"
 
 
 def get_args_back(
@@ -87,18 +84,17 @@ def check_city_for_exceptions(place: str) -> str:
 
 # === BOT Actions ============================================================
 def get_username(update: Update | None = None) -> str:
-    global username
     if update is not None:
-        username = update.message.from_user.first_name
-    return username
+        return update.message.from_user.first_name
+    return "Мой друг"
 
 
 async def send_html(
     update: Update,
     text: str,
     keyboard: InlineKeyboardMarkup | None = None
-) -> None:
-    await update.message.reply_html(
+) -> Message:
+    return await update.message.reply_html(
         text.format(get_username(update)), reply_markup=keyboard)
 
 
@@ -106,9 +102,9 @@ async def bot_send_data(
     update: Update,
     text: str,
     keyboard: InlineKeyboardMarkup | None = None,
-) -> None:
+) -> Message | bool:
     if update.message:
         return await send_html(update, text, keyboard)
     await update.callback_query.answer()
-    await update.callback_query.edit_message_text(
+    return await update.callback_query.edit_message_text(
         text.format(get_username()), reply_markup=keyboard)

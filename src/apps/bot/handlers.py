@@ -54,7 +54,7 @@ async def check_age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int |
         return ConversationHandler.END
     context.user_data[constants.AGE] = age
     # add_backwards(context, constants.AGE) добавлять свой уровень, а при возврате два раза pop()
-    await get_location(update, context)
+    return await get_location(update, context)
 
 
 # 3: NAVIGATION ==================================================================================================================
