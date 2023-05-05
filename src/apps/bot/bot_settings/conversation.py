@@ -7,6 +7,7 @@ GREETING = (
     "или подростка" + emoji.KIDS + ", которому нужна помощь.\n\nСначала "
     "я помогу тебе выбрать фонд, а затем ты "
     "заполнишь " + emoji.WRITING_HAND + " небольшую анкету.")
+
 WHAT_AGE = BOT_SPEAKING + "Сколько тебе лет, {}?"
 REFUSAL = (
     BOT_SPEAKING + "{}, спасибо, что ты уже стремишься помогать другим "
@@ -15,7 +16,7 @@ REFUSAL = (
     "себя в другом волонтерском проекте. Удачи!!!" + emoji.OK)
 WHAT_LOCATION = BOT_SPEAKING + "{}, в каком ты городе?"
 CHOOSE_COUNTRY = BOT_SPEAKING + "{}, выбери страну"
-CHOOSE_REGION = BOT_SPEAKING + "{}, выбери регион в твоей стране: "
+CHOOSE_REGION = BOT_SPEAKING + "{}, выбери регион:"
 CHOOSE_CITY = BOT_SPEAKING + "{}, выбери город в твоем регионе: "
 CHOOSE_FUND = BOT_SPEAKING + "{}, выбери фонд в твоем городе: "
 PRESS_BUTTON_TO_FILL_FORM = (

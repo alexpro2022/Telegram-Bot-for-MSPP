@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message, ReplyKeyboardRemove, Update
 from telegram.ext import ContextTypes
 
-from .bot_settings import cbq, constants, emoji
+from .bot_settings import cbq, emoji
 
 
 def get_args_back(
@@ -41,21 +41,13 @@ async def remove_keyboard(update: Update, text: str = "") -> str:
     await update.message.reply_text(text, reply_markup=ReplyKeyboardRemove())
 
 
-# Callback_data handlers =====================================================
-def __is_requested(data: str, prefix: str):
-    return True if data.startswith(prefix) else False
-
-
+# Callback_data checkers =====================================================
 def is_city_requested(callback_data: str) -> bool:
-    return __is_requested(callback_data, cbq.GET_CITY)
+    return callback_data.startswith(cbq.GET_CITY)
 
 
 def is_fund_requested(callback_data: str) -> bool:
-    return __is_requested(callback_data, cbq.GET_FUND) or callback_data == cbq.GET_FUND
-
-
-def is_backwards_requested(callback_data: str) -> bool:
-    return __is_requested(callback_data, cbq.GO_BACK)
+    return callback_data.startswith(cbq.GET_FUND)
 
 
 # Backwards ==================================================================
@@ -65,46 +57,31 @@ def add_if_unique(stack: list, data: str) -> None:
 
 
 def add_backwards(context: ContextTypes.DEFAULT_TYPE, backwards: str) -> None:
+    context.user_data[cbq.STACK] = context.user_data.get(cbq.STACK, [])
     add_if_unique(context.user_data[cbq.STACK], backwards)
 
 
-def check_region_for_exceptions(region: str) -> str:
-    if region in constants.TWO_CAPITALS:
-        return "init"
-    return "region"
-
-
-def check_city_for_exceptions(place: str) -> str:
-    if place in constants.TWO_CAPITALS:
-        return "init"
-    if place == "country":
-        return "country"
-    return "city"
-
-
 # === BOT Actions ============================================================
-def get_username(update: Update | None = None) -> str:
-    if update is not None:
-        return update.message.from_user.first_name
-    return "Мой друг"
-
-
-async def send_html(
-    update: Update,
-    text: str,
-    keyboard: InlineKeyboardMarkup | None = None
-) -> Message:
-    return await update.message.reply_html(
-        text.format(get_username(update)), reply_markup=keyboard)
-
-
 async def bot_send_data(
     update: Update,
     text: str,
     keyboard: InlineKeyboardMarkup | None = None,
 ) -> Message | bool:
-    if update.message:
-        return await send_html(update, text, keyboard)
-    await update.callback_query.answer()
-    return await update.callback_query.edit_message_text(
-        text.format(get_username()), reply_markup=keyboard)
+    if update.message is not None:
+        await update.message.reply_html(
+            text.format(update.message.from_user.first_name),
+            reply_markup=keyboard,
+        )
+    elif update.callback_query is not None:
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text(
+            text.format(update.callback_query.from_user.first_name),
+            reply_markup=keyboard,
+        )
+
+
+# PARSING ====================================================================
+def parse_data(data: Update | str, prefix: str) -> str:
+    if isinstance(data, Update):
+        data = data.callback_query.data
+    return data.replace(prefix, "")

@@ -1,18 +1,16 @@
-from telegram import InlineKeyboardMarkup, Update
-from telegram.ext import ContextTypes
+from telegram import InlineKeyboardMarkup
 
 from .bot_settings import button_text, cbq, constants, conversation
 # from .models import CoverageArea, Fund
 from .utils import get_args_back, get_button, get_keyboard
 
 
-# NAVIGATION CONTROLS - Органы управления навигацией =========================
+# NAVIGATION CONTROLS - управление навигацией =========================
 def get_info(text: str, callback_data: str) -> tuple[str, InlineKeyboardMarkup]:
-    keyboard = get_button(button_text.OK, callback_data)
-    return text, keyboard
+    return text, get_button(button_text.OK, callback_data)
 
 
-def get_init() -> tuple[str, InlineKeyboardMarkup]:
+def get_location() -> tuple[str, InlineKeyboardMarkup]:
     text = conversation.WHAT_LOCATION
     buttons = [
         (button_text.MSK, cbq.GET_FUND + constants.MSK),
@@ -30,7 +28,7 @@ def get_country() -> tuple[str, InlineKeyboardMarkup]:
     text = conversation.CHOOSE_COUNTRY
     buttons = [
         (button_text.KAZ, cbq.GET_FUND + constants.COUNTRY),
-        (button_text.OTHER_COUNTRY, cbq.NO_FUND + constants.COUNTRY),
+        (button_text.OTHER_COUNTRY, cbq.NO_FUND),
     ]
     footer = [get_args_back("В начало")]
     keyboard = get_keyboard(buttons, footer=footer)
@@ -45,7 +43,7 @@ async def get_region(parent_country: str | None = None) -> tuple[str, InlineKeyb
         async for region in CoverageArea.objects.filter(level=1)
         if region.name not in constants.TWO_CAPITALS
     ]
-    footer = [get_args_back("В начало"), (button_text.NO_MY_REGION, cbq.NO_FUND + constants.REGION)]
+    footer = [get_args_back("В начало"), (button_text.NO_MY_REGION, cbq.NO_FUND)]
     keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
 
@@ -57,7 +55,7 @@ async def get_city(parent_region: str) -> tuple[str, InlineKeyboardMarkup]:
         (city.name, cbq.GET_FUND + city.name)
         async for city in CoverageArea.objects.filter(parent__name=parent_region)
     ]
-    footer = [get_args_back("Изменить регион"), (button_text.NO_MY_CITY, cbq.NO_FUND + constants.CITY)]
+    footer = [get_args_back("Изменить регион"), (button_text.NO_MY_CITY, cbq.NO_FUND)]
     keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
 
@@ -84,16 +82,9 @@ def fund_missing() -> tuple[str, InlineKeyboardMarkup]:
     return text, keyboard
 
 
-'''def get_application_started() -> tuple[str, InlineKeyboardMarkup]:
-    text = get_text(constants.APPLICATION_FORM_TEXT)
-    footer = [get_args_back("Изменить фонд"), (constants.TEXT_NEW_APPLICATION, cbq.NEW_APPLICATION_FORM)]
-    keyboard = get_keyboard(footer=footer)
-    return text, keyboard'''
-
-
 def get_confirmation(data: dict) -> tuple[str, InlineKeyboardMarkup]:
     key_error_mesage = "Test data"
-    text = constants.BOT_SPEAKING + (
+    text = conversation.BOT_SPEAKING + (
         f"Твои данные будут отправлены:\n\n"
         f"Фамилия:      {data.get('surname', key_error_mesage)}\n"
         f"Имя:          {data.get('name', key_error_mesage)}\n"
@@ -109,27 +100,10 @@ def get_confirmation(data: dict) -> tuple[str, InlineKeyboardMarkup]:
     )
     footer = [
         get_args_back("Изменить фонд", cbq.GET_FUND),
-        (constants.TEXT_FINISH, cbq.SEND_SPREADSHEET),
+        (button_text.FINISH, cbq.SEND_SPREADSHEET),
     ]
     keyboard = get_keyboard(footer=footer)
     return text, keyboard
-
-
-# PARSING ====================================================================
-def parse_data(data: Update | str, prefix: str) -> str:
-    if isinstance(data, Update):
-        data = data.callback_query.data
-    return data.replace(prefix, "")
-
-
-def set_location(
-    data: Update | str,
-    prefix: str,
-    location_type: str,  # country, region, city
-    context: ContextTypes.DEFAULT_TYPE,
-) -> str:
-    context.user_data[location_type] = parse_data(data, prefix)
-    return context.user_data[location_type]
 
 
 '''

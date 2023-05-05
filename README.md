@@ -1,7 +1,8 @@
 # Проект MSPP: 
 [![MSPP CI/CD](https://github.com/alexpro2022/Telegram-Bot-for-MSPP/actions/workflows/main.yml/badge.svg)](https://github.com/alexpro2022/Telegram-Bot-for-MSPP/actions/workflows/main.yml)
 
-Бот для «Московской школы профессиональной филантропии»
+Бот для «Московской школы профессиональной филантропии».
+Позволяет НКО оперативно получать информацию о новых заявках в волонтёры в качестве наставников для детей-сирот.
 
 
 
@@ -25,7 +26,7 @@
 [![asyncio](https://img.shields.io/badge/-asyncio-464646?logo=)](https://docs.python.org/3/library/asyncio.html)
 [![logging](https://img.shields.io/badge/-logging-464646?logo=)](https://docs.python.org/3/library/logging.html)
 [![typing](https://img.shields.io/badge/-typing-464646?logo=)](https://docs.python.org/3/library/typing.html)
-[![Uvicorn](https://img.shields.io/badge/-Uvicorn-464646?logo=Uvicorn)](https://www.uvicorn.org/)
+[![uvicorn](https://img.shields.io/badge/-uvicorn-464646?logo=Uvicorn)](https://www.uvicorn.org/)
 
 [![JavaScript](https://img.shields.io/badge/-JavaScript-464646?logo=javascript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![HTML](https://img.shields.io/badge/-HTML-464646?logo=html)](https://html.spec.whatwg.org/multipage/)
@@ -65,7 +66,9 @@
 
 
 ## Описание работы:
-Бот позволяет НКО оперативно получать информацию о новых заявках в волонтёры в качестве наставников для детей-сирот.
+Бот позволяет оформить онлайн-заявление:
+  * в волонтёры-наставники для детей-сирот в фондах проекта **ЗНАЧИМ**
+  * на включение местного фонда в проект **ЗНАЧИМ**
 
 [⬆️Оглавление](#оглавление)
 
