@@ -1,4 +1,4 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message, ReplyKeyboardRemove, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message, Update
 from telegram.ext import ContextTypes
 
 from .bot_settings import cbq, emoji
@@ -37,19 +37,6 @@ def get_keyboard(
     return InlineKeyboardMarkup(keyboard)
 
 
-async def remove_keyboard(update: Update, text: str = "") -> str:
-    await update.message.reply_text(text, reply_markup=ReplyKeyboardRemove())
-
-
-# Callback_data checkers =====================================================
-def is_city_requested(callback_data: str) -> bool:
-    return callback_data.startswith(cbq.GET_CITY)
-
-
-def is_fund_requested(callback_data: str) -> bool:
-    return callback_data.startswith(cbq.GET_FUND)
-
-
 # Backwards ==================================================================
 def add_if_unique(stack: list, data: str) -> None:
     if data not in stack:
@@ -85,3 +72,18 @@ def parse_data(data: Update | str, prefix: str) -> str:
     if isinstance(data, Update):
         data = data.callback_query.data
     return data.replace(prefix, "")
+
+
+'''
+async def remove_keyboard(update: Update, text: str = "") -> str:
+    await update.message.reply_text(text, reply_markup=ReplyKeyboardRemove())
+
+
+# Callback_data checkers =====================================================
+def is_city_requested(callback_data: str) -> bool:
+    return callback_data.startswith(cbq.GET_CITY)
+
+
+def is_fund_requested(callback_data: str) -> bool:
+    return callback_data.startswith(cbq.GET_FUND)
+'''

@@ -16,11 +16,7 @@ from apps.registration.utils import read_web_app, send_to_google, webapp
 
 from . import controls
 from .bot_settings import cbq, constants, conversation, funds
-from .utils import (
-    add_backwards,
-    bot_send_data,
-    parse_data,
-)
+from .utils import add_backwards, bot_send_data, parse_data
 
 
 # 1: GREETINGS ===============================================================
