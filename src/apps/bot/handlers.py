@@ -81,7 +81,10 @@ async def get_fund(update: Update, context: ContextTypes.DEFAULT_TYPE, back: boo
 
 async def get_funds_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     add_backwards(context, "")
-    await bot_send_data(update, *controls.get_info(funds.DESCRIPTION, cbq.GO_BACK))
+    text = conversation.BOT_SPEAKING
+    for fund in parse_data(update, cbq.GET_FUNDS_INFO).split(','):
+        text += funds.FUNDS.get(fund) + funds.FUNDS_INFO_SEPARATOR
+    await bot_send_data(update, *controls.get_info(text, cbq.GO_BACK))
 
 
 async def fund_missing(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

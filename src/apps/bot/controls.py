@@ -62,15 +62,13 @@ async def get_city(parent_region: str) -> tuple[str, InlineKeyboardMarkup]:
 
 async def get_fund(parent_city: str, age: str) -> tuple[str, InlineKeyboardMarkup]:
     from .models import Fund
+    funds = [fund.name async for fund in Fund.objects.filter(
+        coverage_area__name=parent_city,
+        age_limit__from_age__lte=int(age),
+    )]
     text = conversation.CHOOSE_FUND + parent_city
-    buttons = [
-        (fund.name, cbq.GET_NEW_MENTOR_FORM + fund.name)
-        async for fund in Fund.objects.filter(
-            coverage_area__name=parent_city,
-            age_limit__from_age__lte=int(age),
-        )
-    ]
-    footer = [get_args_back("Изменить город"), (button_text.FUNDS_INFO, cbq.GET_FUNDS_INFO)]
+    buttons = [(fund, cbq.GET_NEW_MENTOR_FORM + fund) for fund in funds]
+    footer = [get_args_back("Изменить город"), (button_text.FUNDS_INFO, cbq.GET_FUNDS_INFO + ','.join(funds))]
     keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
 
