@@ -1,10 +1,10 @@
 import logging
+
 from telegram import InlineKeyboardMarkup
 
 from .bot_settings import button_text, cbq, constants, conversation
 # from .models import CoverageArea, Fund
 from .utils import get_args_back, get_button, get_keyboard
-
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +85,8 @@ async def get_city_or_and_fund(parent_region: str, age: str) -> tuple[str, Inlin
         keyboard = get_keyboard(keyboard=keyboard_fund + keyboard_city)
         return text, keyboard
     if keyboard_city is not None:
-        return text_city, keyboard_city
-    return text_fund, keyboard_fund, descriptions
+        return text_city, get_keyboard(keyboard=keyboard_city)
+    return text_fund, get_keyboard(keyboard=keyboard_fund), descriptions
 
 
 def fund_missing() -> tuple[str, InlineKeyboardMarkup]:
