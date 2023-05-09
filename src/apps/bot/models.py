@@ -14,9 +14,6 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-    def __str__(self):
-        return f"{self.id}"
-
 
 class CoverageArea(MPTTModel, BaseModel):
     name = models.CharField(
@@ -44,61 +41,13 @@ class CoverageArea(MPTTModel, BaseModel):
         return self.name
 
 
-class AgeLimit(BaseModel):
-    """
-    AgeLimit class model.
-    It provides ``from_age`` and ``to_age`` fields.
-    """
-
-    from_age = models.PositiveSmallIntegerField(
-        verbose_name="нижняя граница",
-    )
-    to_age = models.PositiveSmallIntegerField(
-        verbose_name="верхняя граница",
-        null=True,
-        blank=True,
-    )
-
-    class Meta:
-        ordering = ("from_age", "to_age")
-        verbose_name = "возрастное ограничение"
-        verbose_name_plural = "возрастные ограничения"
-        constraints = [
-            models.UniqueConstraint(
-                fields=("from_age", "to_age"),
-                name="возрастное ограничение должно быть уникальным",
-            ),
-            models.UniqueConstraint(
-                fields=("from_age",),
-                name="значение нижней границы, при не указанной верхней, должно быть уникальным",
-                condition=models.Q(to_age__isnull=True),
-            ),
-            models.CheckConstraint(
-                check=models.Q(from_age__lte=models.F("to_age")), name="нижняя граница не может быть больше верхней"
-            ),
-        ]
-
-    def __str__(self):
-        result = [f"От {self.from_age}"]
-        if self.to_age is not None:
-            result.append(f"до {self.to_age}")
-        return " ".join(result)
-
-
 class Fund(BaseModel):
     """Fund class model."""
 
-    name = models.CharField(
-        verbose_name="название",
-        max_length=256,
-    )
-    coverage_area = TreeManyToManyField(CoverageArea, related_name="funds", verbose_name="зоны охвата")
-    age_limit = models.ForeignKey(
-        AgeLimit,
-        verbose_name="возрастные ограничения",
-        on_delete=models.PROTECT,
-    )
-    description = models.TextField(verbose_name="описание")
+    name = models.CharField(max_length=256, verbose_name="Название", unique=True)
+    coverage_area = TreeManyToManyField(CoverageArea, related_name="funds", verbose_name="Зоны охвата")
+    age_limit = models.PositiveSmallIntegerField(verbose_name="Минимальный возраст")
+    description = models.TextField(verbose_name="Описание")
 
     class Meta:
         ordering = ("name",)

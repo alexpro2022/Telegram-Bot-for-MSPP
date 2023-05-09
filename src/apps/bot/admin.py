@@ -2,16 +2,11 @@ from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
 
 from .forms import FundAdminForm
-from .models import AgeLimit, CoverageArea, Fund
+from .models import CoverageArea, Fund
 
 
 @admin.register(CoverageArea)
 class CoverageAreaAdmin(MPTTModelAdmin):
-    pass
-
-
-@admin.register(AgeLimit)
-class АgeLimitAdmin(admin.ModelAdmin):
     pass
 
 

@@ -15,7 +15,7 @@ from telegram.ext import (
 from apps.registration.utils import read_web_app, send_to_google, webapp
 
 from . import controls
-from .bot_settings import cbq, constants, conversation, funds
+from .bot_settings import cbq, constants, conversation, emoji
 from .utils import add_backwards, bot_send_data, parse_data
 
 
@@ -64,26 +64,40 @@ async def get_region(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await bot_send_data(update, *await controls.get_region())
 
 
-async def get_city(update: Update, context: ContextTypes.DEFAULT_TYPE, back: bool = False) -> None:
-    add_backwards(context, constants.CITY)
-    if not back:
+async def get_city(update: Update, context: ContextTypes.DEFAULT_TYPE, backwards: bool = False) -> None:
+    if not backwards:
         context.user_data[constants.REGION] = parse_data(update, cbq.GET_CITY)
+    add_backwards(context, constants.CITY)
     await bot_send_data(update, *await controls.get_city(context.user_data[constants.REGION]))
 
 
 # 4: FUNDS ===================================================================
-async def get_fund(update: Update, context: ContextTypes.DEFAULT_TYPE, back: bool = False) -> None:
-    add_backwards(context, constants.FUND)
-    if not back:
+async def get_fund(update: Update, context: ContextTypes.DEFAULT_TYPE, backwards: bool = False) -> None:
+    if not backwards:
         context.user_data[constants.CITY] = parse_data(update, cbq.GET_FUND)
-    await bot_send_data(update, *await controls.get_fund(context.user_data[constants.CITY], context.user_data[constants.AGE]))
+        parent_location = context.user_data[constants.CITY]
+    else:
+        parent_location = context.user_data.get(constants.CITY) or context.user_data.get(constants.REGION)
+    text, keyboard, descriptions = await controls.get_fund(parent_location, context.user_data[constants.AGE])
+    context.user_data[constants.FUND_INFO] = descriptions
+    add_backwards(context, constants.FUND)
+    await bot_send_data(update, text, keyboard)
+
+
+async def get_city_or_and_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data[constants.REGION] = parse_data(update, cbq.GET_CITY_OR_AND_FUND)
+    result = await controls.get_city_or_and_fund(context.user_data[constants.REGION], context.user_data[constants.AGE])
+    if len(result) == 3:
+        context.user_data[constants.FUND_INFO] = result[2]
+    add_backwards(context, constants.FUND)
+    await bot_send_data(update, result[0], result[1])
 
 
 async def get_funds_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    add_backwards(context, "")
     text = conversation.BOT_SPEAKING
-    for fund in parse_data(update, cbq.GET_FUNDS_INFO).split(','):
-        text += funds.FUNDS.get(fund) + funds.FUNDS_INFO_SEPARATOR
+    for description in context.user_data.get(constants.FUND_INFO):
+        text += description + f"\n{emoji.GROWING_HEART*3}\n"
+    add_backwards(context, "")
     await bot_send_data(update, *controls.get_info(text, cbq.GO_BACK))
 
 
@@ -120,17 +134,17 @@ async def read_webapp_send_to_google(update: Update, context: ContextTypes.DEFAU
 async def backwards(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         context.user_data.get(cbq.STACK).pop()
-        category = context.user_data.get(cbq.STACK).pop()
+        previous = context.user_data.get(cbq.STACK).pop()
     except IndexError:
         await get_location(update, context)
     else:
-        match category:
+        match previous:
             case constants.AGE: await get_age(update, context)
             case constants.LOCATION: await get_location(update, context)
             case constants.COUNTRY: await get_country(update, context)
             case constants.REGION: await get_region(update, context)
-            case constants.CITY: await get_city(update, context, back=True)
-            case constants.FUND: await get_fund(update, context, back=True)
+            case constants.CITY: await get_city(update, context, True)
+            case constants.FUND: await get_fund(update, context, True)
 
 
 # 5: CONVERSATION ==================================================================================================================
@@ -146,6 +160,7 @@ HANDLERS = (
                 CallbackQueryHandler(get_country, cbq.GET_COUNTRY),
                 CallbackQueryHandler(get_city, cbq.GET_CITY),
                 CallbackQueryHandler(get_fund, cbq.GET_FUND),
+                CallbackQueryHandler(get_city_or_and_fund, cbq.GET_CITY_OR_AND_FUND),
                 CallbackQueryHandler(get_funds_info, cbq.GET_FUNDS_INFO),
                 CallbackQueryHandler(fund_missing, cbq.NO_FUND),
                 CallbackQueryHandler(get_new_fund_form, cbq.GET_NEW_FUND_FORM),

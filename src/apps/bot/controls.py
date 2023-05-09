@@ -1,3 +1,4 @@
+import logging
 from telegram import InlineKeyboardMarkup
 
 from .bot_settings import button_text, cbq, constants, conversation
@@ -5,7 +6,9 @@ from .bot_settings import button_text, cbq, constants, conversation
 from .utils import get_args_back, get_button, get_keyboard
 
 
-# NAVIGATION CONTROLS - управление навигацией =========================
+logger = logging.getLogger(__name__)
+
+
 def get_info(text: str, callback_data: str) -> tuple[str, InlineKeyboardMarkup]:
     return text, get_button(button_text.OK, callback_data)
 
@@ -14,7 +17,7 @@ def get_location() -> tuple[str, InlineKeyboardMarkup]:
     text = conversation.WHAT_LOCATION
     buttons = [
         (button_text.MSK, cbq.GET_FUND + constants.MSK),
-        (button_text.MSK_reg, cbq.GET_FUND + constants.MSK_reg),
+        (button_text.MSK_REG, cbq.GET_FUND + constants.MSK_REG),
         (button_text.SPB, cbq.GET_FUND + constants.SPB),
         (button_text.OTHER_REGION, cbq.GET_REGION),
         (button_text.OUTSIDE_COUNTRY, cbq.GET_COUNTRY),
@@ -27,7 +30,7 @@ def get_location() -> tuple[str, InlineKeyboardMarkup]:
 def get_country() -> tuple[str, InlineKeyboardMarkup]:
     text = conversation.CHOOSE_COUNTRY
     buttons = [
-        (button_text.KAZ, cbq.GET_FUND + constants.COUNTRY),
+        (button_text.KAZ, cbq.GET_FUND + constants.KAZ),
         (button_text.OTHER_COUNTRY, cbq.NO_FUND),
     ]
     footer = [get_args_back("В начало")]
@@ -35,11 +38,11 @@ def get_country() -> tuple[str, InlineKeyboardMarkup]:
     return text, keyboard
 
 
-async def get_region(parent_country: str | None = None) -> tuple[str, InlineKeyboardMarkup]:
+async def get_region(parent_country: str = "Россия") -> tuple[str, InlineKeyboardMarkup]:
     from .models import CoverageArea
-    text = conversation.CHOOSE_REGION
+    text = conversation.CHOOSE_REGION + parent_country
     buttons = [
-        (region.name, cbq.GET_CITY + region.name)
+        (region.name, cbq.GET_CITY_OR_AND_FUND + region.name)
         async for region in CoverageArea.objects.filter(level=1)
         if region.name not in constants.TWO_CAPITALS
     ]
@@ -48,7 +51,7 @@ async def get_region(parent_country: str | None = None) -> tuple[str, InlineKeyb
     return text, keyboard
 
 
-async def get_city(parent_region: str) -> tuple[str, InlineKeyboardMarkup]:
+async def get_city(parent_region: str, markup: bool = True) -> tuple[str, InlineKeyboardMarkup]:
     from .models import CoverageArea
     text = conversation.CHOOSE_CITY + parent_region
     buttons = [
@@ -56,21 +59,34 @@ async def get_city(parent_region: str) -> tuple[str, InlineKeyboardMarkup]:
         async for city in CoverageArea.objects.filter(parent__name=parent_region)
     ]
     footer = [get_args_back("Изменить регион"), (button_text.NO_MY_CITY, cbq.NO_FUND)]
-    keyboard = get_keyboard(buttons, footer=footer)
+    keyboard = get_keyboard(buttons, footer=footer, markup=markup)
     return text, keyboard
 
 
-async def get_fund(parent_city: str, age: str) -> tuple[str, InlineKeyboardMarkup]:
+async def get_fund(parent_location: str, age: str, markup: bool = True) -> tuple[str, InlineKeyboardMarkup]:
     from .models import Fund
-    funds = [fund.name async for fund in Fund.objects.filter(
-        coverage_area__name=parent_city,
-        age_limit__from_age__lte=int(age),
+    text = conversation.CHOOSE_FUND + parent_location + f', возраст: {age}'
+    funds = [fund async for fund in Fund.objects.filter(
+        coverage_area__name=parent_location,
+        age_limit__lte=int(age),
     )]
-    text = conversation.CHOOSE_FUND + parent_city
-    buttons = [(fund, cbq.GET_NEW_MENTOR_FORM + fund) for fund in funds]
-    footer = [get_args_back("Изменить город"), (button_text.FUNDS_INFO, cbq.GET_FUNDS_INFO + ','.join(funds))]
-    keyboard = get_keyboard(buttons, footer=footer)
-    return text, keyboard
+    buttons = [(fund.name, cbq.GET_NEW_MENTOR_FORM + fund.name) for fund in funds]
+    footer = [get_args_back("Изменить город"), (button_text.FUNDS_INFO, cbq.GET_FUNDS_INFO)]
+    keyboard = get_keyboard(buttons, footer=footer, markup=markup)
+    descriptions = [fund.description for fund in funds]
+    return text, keyboard, descriptions
+
+
+async def get_city_or_and_fund(parent_region: str, age: str) -> tuple[str, InlineKeyboardMarkup]:
+    text_city, keyboard_city = await get_city(parent_region, markup=False)
+    text_fund, keyboard_fund, descriptions = await get_fund(parent_region, age, markup=False)
+    if keyboard_fund is not None and keyboard_city is not None:
+        text = conversation.CHOOSE_FUND_OR_CITY + parent_region + f', возраст: {age}'
+        keyboard = get_keyboard(keyboard=keyboard_fund + keyboard_city)
+        return text, keyboard
+    if keyboard_city is not None:
+        return text_city, keyboard_city
+    return text_fund, keyboard_fund, descriptions
 
 
 def fund_missing() -> tuple[str, InlineKeyboardMarkup]:

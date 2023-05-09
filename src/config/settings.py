@@ -143,14 +143,18 @@ ENV_INFO = {
     "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
 }
 
-LOGGING_LEVEL = env("LOGGING_LEVEL", default="DEBUG")
+LOGGING_LEVEL = env("LOGGING_LEVEL", default="INFO")
 LOG_DIR = BASE_DIR / "logs"
-LOGGING_FILENAME = LOG_DIR / "system.log"
-LOGGING_FILENAME_BOT = LOG_DIR / "bot.log"
+LOGGING_FILENAME = LOG_DIR / "main.log"
+# LOGGING_FILENAME_BOT = LOG_DIR / "bot.log"
 FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
 logging.basicConfig(
     level=LOGGING_LEVEL,
-    filename=LOGGING_FILENAME,
-    filemode="w",
+    # filename=LOGGING_FILENAME,
+    # filemode="w",
     format="%(asctime)s %(levelname)s %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(LOGGING_FILENAME, encoding='utf-8'),
+    ]
 )

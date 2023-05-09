@@ -14,6 +14,9 @@ def get_args_back(
 
 # BUTTONS ====================================================================
 def __button(text: str, callback_data: str) -> InlineKeyboardButton:
+    # callback_data has a size limitation of 64 bytes
+    while len(callback_data.encode()) > 64:
+        callback_data = callback_data[:-1]
     return InlineKeyboardButton(text=text, callback_data=callback_data)
 
 
@@ -22,19 +25,27 @@ def get_button(text: str, callback_data: str) -> InlineKeyboardMarkup:
 
 
 def get_keyboard(
-    args: list[tuple[str, str]] | None = None,
+    args: list[tuple[str, str]] = None,
     *,
-    header: list[tuple[str, str]] | None = None,
-    footer: list[tuple[str, str]] | None = None,
-) -> InlineKeyboardMarkup:
+    header: list[tuple[str, str]] = None,
+    footer: list[tuple[str, str]] = None,
+    markup: bool = True,
+    keyboard: list = None
+) -> InlineKeyboardMarkup | list | None:
+    if keyboard is not None:
+        return InlineKeyboardMarkup(keyboard)
     keyboard = []
     if header is not None:
         keyboard.append([__button(item[0], item[1]) for item in header])
     if args is not None:
+        if args == []:
+            return None
         keyboard.extend([[__button(item[0], item[1])] for item in args])
     if footer is not None:
         keyboard.append([__button(item[0], item[1]) for item in footer])
-    return InlineKeyboardMarkup(keyboard)
+    if markup:
+        return InlineKeyboardMarkup(keyboard)
+    return keyboard
 
 
 # Backwards ==================================================================
@@ -52,7 +63,7 @@ def add_backwards(context: ContextTypes.DEFAULT_TYPE, backwards: str) -> None:
 async def bot_send_data(
     update: Update,
     text: str,
-    keyboard: InlineKeyboardMarkup | None = None,
+    keyboard: InlineKeyboardMarkup = None,
 ) -> Message | bool:
     if update.message is not None:
         await update.message.reply_html(

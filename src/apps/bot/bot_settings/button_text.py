@@ -5,7 +5,7 @@ FILL_FORM = "Заполнить анкету" + emoji.GO_AHEAD
 FINISH = "Готово" + emoji.FINISH
 
 MSK = constants.MSK + emoji.MSK
-MSK_reg = constants.MSK_reg + emoji.MSK_reg
+MSK_REG = constants.MSK_REG + emoji.MSK_REG
 SPB = constants.SPB + emoji.SPB
 
 OUTSIDE_COUNTRY = "Я не в России" + emoji.OUTSIDE_COUNTRY
