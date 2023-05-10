@@ -54,13 +54,7 @@ async def send_to_google(
     )
     return ConversationHandler.END
 
-    # await update.callback_query.answer()
-    # await update.callback_query.delete_message()
-    '''await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=message_text,
-        reply_markup=ReplyKeyboardMarkup.from_button(
-            KeyboardButton(button_text, web_app=WebAppInfo(url=url))))'''
+
 '''reply_markup=ReplyKeyboardMarkup(
             [[KeyboardButton(button_text, web_app=WebAppInfo(url=url))]],
             one_time_keyboard=True,
