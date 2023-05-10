@@ -22,8 +22,7 @@ def get_location() -> tuple[str, InlineKeyboardMarkup]:
         (button_text.OTHER_REGION, cbq.GET_REGION),
         (button_text.OUTSIDE_COUNTRY, cbq.GET_COUNTRY),
     ]
-    footer = [get_args_back("Изменить возраст")]
-    keyboard = get_keyboard(buttons, footer=footer)
+    keyboard = get_keyboard(buttons)
     return text, keyboard
 
 
@@ -71,7 +70,10 @@ async def get_fund(parent_location: str, age: str, markup: bool = True) -> tuple
         age_limit__lte=int(age),
     )]
     buttons = [(fund.name, cbq.GET_NEW_MENTOR_FORM + fund.name) for fund in funds]
-    footer = [get_args_back("Изменить город"), (button_text.FUNDS_INFO, cbq.GET_FUNDS_INFO)]
+    if markup:
+        footer = [get_args_back("Изменить город"), (button_text.FUNDS_INFO, cbq.GET_FUNDS_INFO)]
+    else:
+        footer = [(button_text.FUNDS_INFO, cbq.GET_FUNDS_INFO)]
     keyboard = get_keyboard(buttons, footer=footer, markup=markup)
     descriptions = [fund.description for fund in funds]
     return text, keyboard, descriptions
@@ -83,13 +85,15 @@ async def get_city_or_and_fund(parent_region: str, age: str) -> tuple[str, Inlin
     if keyboard_fund is not None and keyboard_city is not None:
         text = conversation.CHOOSE_FUND_OR_CITY + parent_region + f', возраст: {age}'
         keyboard = get_keyboard(keyboard=keyboard_fund + keyboard_city)
-        return text, keyboard
+        return text, keyboard, descriptions
     if keyboard_city is not None:
         return text_city, get_keyboard(keyboard=keyboard_city)
-    return text_fund, get_keyboard(keyboard=keyboard_fund), descriptions
+    if keyboard_fund is not None:
+        return text_fund, get_keyboard(keyboard=keyboard_fund), descriptions
+    return None
 
 
-def fund_missing() -> tuple[str, InlineKeyboardMarkup]:
+def no_fund() -> tuple[str, InlineKeyboardMarkup]:
     text = conversation.NO_FUND_MESSAGE
     footer = [get_args_back(), (button_text.NEW_FUND, cbq.GET_NEW_FUND_FORM)]
     keyboard = get_keyboard(footer=footer)
@@ -113,18 +117,8 @@ def get_confirmation(data: dict) -> tuple[str, InlineKeyboardMarkup]:
         f"Фонд:         {data.get('fund', key_error_mesage)}\n\n"
     )
     footer = [
-        get_args_back("Изменить фонд", cbq.GET_FUND),
+        get_args_back("Изменить фонд", cbq.GO_BACK),
         (button_text.FINISH, cbq.SEND_SPREADSHEET),
     ]
     keyboard = get_keyboard(footer=footer)
     return text, keyboard
-
-
-'''
-    buttons = [
-        ("1 Арифметика добра", cbq.GET_APPLICATION_STARTED + "1 Арифметика добра"),
-        ("2 Арифметика добра", cbq.GET_APPLICATION_STARTED + "2 Арифметика добра"),
-        ("3 Арифметика добра", cbq.GET_APPLICATION_STARTED + "3 Арифметика добра"),
-        ("4 Арифметика добра", cbq.GET_APPLICATION_STARTED + "4 Арифметика добра"),
-        ("5 Арифметика добра", cbq.GET_APPLICATION_STARTED + "5 Арифметика добра"),
-    ]'''

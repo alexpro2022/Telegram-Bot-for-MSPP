@@ -20,3 +20,5 @@ NO_MY_CITY = "Нет моего города" + emoji.SHRUGGING
 
 FUNDS_INFO = "Про фонды" + emoji.BOOK
 NEW_FUND = "Да, давай" + emoji.OK
+
+FILL_FORM = "Заполнить анкету " + emoji.WRITING_HAND

@@ -21,7 +21,7 @@ CHOOSE_CITY = BOT_SPEAKING + "{}, выбери город в твоем реги
 CHOOSE_FUND = BOT_SPEAKING + "{}, выбери фонд в твоем городе: "
 CHOOSE_FUND_OR_CITY = BOT_SPEAKING + "{}, ты можешь выбрать региональный фонд или город в твоем регионе: "
 PRESS_BUTTON_TO_FILL_FORM = (
-    BOT_SPEAKING + "Нажми на кнопку ниже, чтобы заполнить "
+    BOT_SPEAKING + "{}, нажми на кнопку ниже, чтобы заполнить "
     "анкету " + emoji.PRESS_BUTTON)
 NO_FUND_MESSAGE = (
     BOT_SPEAKING + "{}, к сожалению на данный момент проект не реализуется "

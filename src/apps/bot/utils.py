@@ -1,4 +1,4 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Message, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from .bot_settings import cbq, emoji
@@ -49,29 +49,45 @@ def get_keyboard(
 
 
 # Backwards ==================================================================
-def add_if_unique(stack: list, data: str) -> None:
-    if data not in stack:
-        stack.append(data)
+def __add_if_unique(cache: list, data: str) -> None:
+    if data not in cache:
+        cache.append(data)
 
 
-def add_backwards(context: ContextTypes.DEFAULT_TYPE, backwards: str) -> None:
-    context.user_data[cbq.STACK] = context.user_data.get(cbq.STACK, [])
-    add_if_unique(context.user_data[cbq.STACK], backwards)
+def add_backwards(
+    context: ContextTypes.DEFAULT_TYPE,
+    text: str,
+    keyboard: InlineKeyboardMarkup = None,
+) -> None:
+    context.user_data[cbq.CACHE] = context.user_data.get(cbq.CACHE, [])
+    __add_if_unique(context.user_data[cbq.CACHE], (text, keyboard))
 
 
 # === BOT Actions ============================================================
 async def bot_send_data(
     update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
     text: str,
     keyboard: InlineKeyboardMarkup = None,
-) -> Message | bool:
-    if update.message is not None:
+    *,
+    backwards: bool = True,
+    in_place: bool = True,
+) -> None:
+    if backwards:
+        add_backwards(context, text, keyboard)
+    if not in_place:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=text.format(update.effective_user.first_name),
+            reply_markup=keyboard,
+        )
+    elif update.message is not None:
         await update.message.reply_html(
             text.format(update.message.from_user.first_name),
             reply_markup=keyboard,
         )
     elif update.callback_query is not None:
-        await update.callback_query.answer()
+        # await update.callback_query.answer()
         await update.callback_query.edit_message_text(
             text.format(update.callback_query.from_user.first_name),
             reply_markup=keyboard,
