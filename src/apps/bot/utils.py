@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
-from .bot_settings import cbq, emoji
+from .bot_settings import cbq, constants, emoji
 
 
 def get_args_back(
@@ -24,6 +24,13 @@ def get_button(text: str, callback_data: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup.from_button(__button(text, callback_data))
 
 
+def add_footer(
+    keyboard: list,
+    footer: list[tuple[str, str]],
+) -> list:
+    keyboard.append([__button(item[0], item[1]) for item in footer])
+
+
 def get_keyboard(
     args: list[tuple[str, str]] = None,
     *,
@@ -42,7 +49,7 @@ def get_keyboard(
             return None
         keyboard.extend([[__button(item[0], item[1])] for item in args])
     if footer is not None:
-        keyboard.append([__button(item[0], item[1]) for item in footer])
+        add_footer(keyboard, footer)
     if markup:
         return InlineKeyboardMarkup(keyboard)
     return keyboard
@@ -59,8 +66,8 @@ def add_backwards(
     text: str,
     keyboard: InlineKeyboardMarkup = None,
 ) -> None:
-    context.user_data[cbq.CACHE] = context.user_data.get(cbq.CACHE, [])
-    __add_if_unique(context.user_data[cbq.CACHE], (text, keyboard))
+    context.user_data[constants.CACHE] = context.user_data.get(constants.CACHE, [])
+    __add_if_unique(context.user_data[constants.CACHE], (text, keyboard))
 
 
 # === BOT Actions ============================================================
@@ -87,7 +94,6 @@ async def bot_send_data(
             reply_markup=keyboard,
         )
     elif update.callback_query is not None:
-        # await update.callback_query.answer()
         await update.callback_query.edit_message_text(
             text.format(update.callback_query.from_user.first_name),
             reply_markup=keyboard,
@@ -99,6 +105,26 @@ def parse_data(data: Update | str, prefix: str) -> str:
     if isinstance(data, Update):
         data = data.callback_query.data
     return data.replace(prefix, "")
+
+
+def reset_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, step: str) -> None:
+    match step:
+        case constants.LOCATION:
+            temp = context.user_data[constants.AGE]
+            context.user_data.clear()
+            context.user_data[constants.COUNTRY] = "Россия"
+            context.user_data[constants.AGE] = temp
+        case constants.REGION:
+            context.user_data.pop(constants.REGION, '')
+        case constants.CITY_OR_AND_FUND:
+            context.user_data.pop(constants.CITY, '')
+            context.user_data.pop(constants.FUND, '')
+            context.user_data[constants.REGION] = parse_data(update, cbq.GET_CITY_OR_AND_FUND)
+        case constants.FUND:
+            context.user_data.pop(constants.FUND, '')
+            context.user_data[constants.CITY] = parse_data(update, cbq.GET_FUND)
+            if context.user_data[constants.CITY] in constants.TWO_CAPITALS:
+                context.user_data.pop(constants.REGION, '')
 
 
 '''

@@ -13,6 +13,7 @@ COUNTRY = "country"
 KAZ = "Казахстан"
 
 CITY = "city"
+CITY_OR_AND_FUND = "city_or_and_fund"
 NO_CITY = "Нет моего города"
 
 FUND = "fund"
@@ -22,3 +23,5 @@ NEW_FUND = "new_fund"
 NEW_FUND_FORM = "new_fund_form"
 
 MAIN_CONVERSATION = "Главная ветка беседы"
+NEW_MENTOR = "new_mentor"
+CACHE = "cache"

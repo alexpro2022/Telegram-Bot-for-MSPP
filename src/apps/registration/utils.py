@@ -1,9 +1,8 @@
 import json
 
-from telegram import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, Update, WebAppInfo
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo
+from telegram.ext import ContextTypes
 
-from apps.bot import menu
 from apps.bot.bot_settings import button_text, conversation
 from apps.bot.utils import add_backwards, bot_send_data
 
@@ -24,21 +23,22 @@ async def read_web_app(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ) -> str | None:
+    """
+    Loads WebApp data,
+    checks if WebApp BackButton has been clicked and returns back,
+    otherwise fills context.user_data with loaded WebApp data.
+    """
     data = json.loads(update.effective_message.web_app_data.data)
-    # if telegram BackButton was clicked:
+    # if (back := data.get("back")) is not None:
     back = data.get("back")
     if back is not None:
         add_backwards(context, "fund", None)
         return back
-    # else fill the context.user_data with webapp data
     for key in data.keys():
         context.user_data[key] = data[key]
-    # and get the final confirmation
-    return await bot_send_data(
-        update, context, *menu.get_confirmation(context.user_data))
 
 
-async def send_to_google(
+'''async def send_to_google(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     message_text: str = (
@@ -52,7 +52,7 @@ async def send_to_google(
         f"{message_text}\n{form_data}\n",
         reply_markup=ReplyKeyboardRemove(),
     )
-    return ConversationHandler.END
+    return ConversationHandler.END'''
 
 
 '''reply_markup=ReplyKeyboardMarkup(

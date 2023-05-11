@@ -69,6 +69,10 @@ const checkInputValidity = (element, errElement) => {
     not_allowed_simbols = /[^А-Яа-я\w\s]/
     isCapitalize = false;
     break;
+   case "location":
+    not_allowed_simbols = /[^А-Яа-я\s]/
+    isCapitalize = true;
+    break;    
    default:
     not_allowed_simbols = /[^А-Яа-я]/;
     isCapitalize = true;    

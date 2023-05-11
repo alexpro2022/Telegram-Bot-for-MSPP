@@ -12,11 +12,20 @@ from telegram.ext import (
     filters,
 )
 
-from apps.registration.utils import read_web_app, send_to_google, webapp
+from apps.registration.utils import read_web_app, webapp
 
 from . import menu
 from .bot_settings import cbq, constants, conversation, emoji
-from .utils import bot_send_data, parse_data
+from .utils import bot_send_data, parse_data, reset_user_data
+
+
+async def backwards(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    try:
+        context.user_data.get(constants.CACHE).pop()
+        previous = context.user_data.get(constants.CACHE).pop()
+    except IndexError:
+        return await get_location(update, context)
+    return await bot_send_data(update, context, *previous)
 
 
 async def greetings(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -37,15 +46,8 @@ async def check_age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int |
     return await get_location(update, context)
 
 
-def __reset_user_data(context: ContextTypes.DEFAULT_TYPE) -> None:
-    temp = context.user_data[constants.AGE]
-    context.user_data.clear()
-    context.user_data[constants.COUNTRY] = "Россия"
-    context.user_data[constants.AGE] = temp
-
-
 async def get_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    __reset_user_data(context)
+    reset_user_data(update, context, constants.LOCATION)
     await bot_send_data(update, context, *menu.get_location())
 
 
@@ -54,11 +56,12 @@ async def get_country(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 async def get_region(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    reset_user_data(update, context, constants.REGION)
     await bot_send_data(update, context, *await menu.get_region())
 
 
 async def get_city_or_and_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data[constants.REGION] = parse_data(update, cbq.GET_CITY_OR_AND_FUND)
+    reset_user_data(update, context, constants.CITY_OR_AND_FUND)
     result = await menu.get_city_or_and_fund(
         context.user_data[constants.REGION], context.user_data[constants.AGE])
     if result is None:
@@ -68,13 +71,8 @@ async def get_city_or_and_fund(update: Update, context: ContextTypes.DEFAULT_TYP
     return await bot_send_data(update, context, result[0], result[1])
 
 
-'''async def get_city(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data[constants.REGION] = parse_data(update, cbq.GET_CITY)
-    await bot_send_data(update, context, *await menu.get_city(context.user_data[constants.REGION]))'''
-
-
 async def get_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data[constants.CITY] = parse_data(update, cbq.GET_FUND)
+    reset_user_data(update, context, constants.FUND)
     text, keyboard, descriptions = await menu.get_fund(
         context.user_data[constants.CITY], context.user_data[constants.AGE])
     if keyboard is None:
@@ -85,7 +83,7 @@ async def get_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def get_funds_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     delimeter = f"\n{emoji.GROWING_HEART*3}\n"
-    text = conversation.BOT_SPEAKING
+    text = conversation.BOT_SPEAKING[:-1]
     for description in context.user_data.get(constants.FUND_INFO):
         text += delimeter + description
     await bot_send_data(update, context, *menu.get_info(text, cbq.GO_BACK))
@@ -100,10 +98,21 @@ async def get_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         context.user_data.get(constants.AGE)
     ]))
     await webapp(update, context, url)
+    return constants.NEW_FUND
+
+
+async def read_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await read_web_app(update, context)
+    await bot_send_data(
+        update, context,
+        *menu.get_confirmation(
+            context.user_data, form_for=constants.NEW_FUND), backwards=False)
+    # return ConversationHandler.END
 
 
 async def get_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data[constants.FUND] = parse_data(update, cbq.GET_NEW_MENTOR_FORM)
+    context.user_data[constants.FUND] = parse_data(update, cbq.GET_NEW_MENTOR_FORM) or context.user_data[constants.FUND]
+    # context.user_data.get(constants.FUND, parse_data(update, cbq.GET_NEW_MENTOR_FORM))
     url = urljoin(settings.APPLICATION_URL, reverse('new_user', args=[
         context.user_data.get(constants.AGE),
         context.user_data.get(constants.REGION, ' '),
@@ -113,19 +122,14 @@ async def get_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYPE
     await webapp(update, context, url)
 
 
-async def read_webapp_send_to_google(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def read_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     back = await read_web_app(update, context)
     if back is not None:
-        await backwards(update, context)
-
-
-async def backwards(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    try:
-        context.user_data.get(cbq.CACHE).pop()
-        previous = context.user_data.get(cbq.CACHE).pop()
-    except IndexError:
-        return await get_location(update, context)
-    return await bot_send_data(update, context, *previous)
+        return await backwards(update, context)
+    await bot_send_data(
+        update, context,
+        *menu.get_confirmation(context.user_data), backwards=False)
+    # return ConversationHandler.END
 
 
 HANDLERS = (
@@ -142,10 +146,14 @@ HANDLERS = (
                 CallbackQueryHandler(get_fund, cbq.GET_FUND),
                 CallbackQueryHandler(get_funds_info, cbq.GET_FUNDS_INFO),
                 CallbackQueryHandler(no_fund, cbq.NO_FUND),
-                CallbackQueryHandler(get_new_fund_form, cbq.GET_NEW_FUND_FORM),
+                # CallbackQueryHandler(get_new_fund_form, cbq.GET_NEW_FUND_FORM),
                 CallbackQueryHandler(get_new_mentor_form, cbq.GET_NEW_MENTOR_FORM),
-                CallbackQueryHandler(send_to_google, cbq.SEND_SPREADSHEET),
-                MessageHandler(filters.StatusUpdate.WEB_APP_DATA, read_webapp_send_to_google),
+                # CallbackQueryHandler(send_to_google, cbq.SEND_SPREADSHEET),
+                MessageHandler(filters.StatusUpdate.WEB_APP_DATA, read_new_mentor_form),
+            ],
+            constants.NEW_FUND: [
+                CallbackQueryHandler(get_new_fund_form, cbq.GET_NEW_FUND_FORM),
+                MessageHandler(filters.StatusUpdate.WEB_APP_DATA, read_new_fund_form),
             ],
         },
         fallbacks=[CommandHandler("start", greetings)],
