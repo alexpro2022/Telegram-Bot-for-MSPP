@@ -126,7 +126,7 @@ async def read_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYP
     back = await read_web_app(update, context)
     if back is not None:
         return await backwards(update, context)
-    await bot_send_data(
+    return await bot_send_data(
         update, context,
         *menu.get_confirmation(context.user_data), backwards=False)
     # return ConversationHandler.END

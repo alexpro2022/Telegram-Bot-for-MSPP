@@ -118,7 +118,7 @@ def get_confirmation(data: dict, form_for: str = constants.NEW_MENTOR) -> tuple[
     age = f"Возраст:      {data.get('age', key_error_mesage)}\n"
     region = f"Регион:       {data.get('region', ' ')}\n"
     city = f"Город:        {data.get('city', ' ')}\n"
-    # country = 
+    # country =
     fund = f"Фонд:         {data.get('fund', key_error_mesage)}\n"
     location = f"Локация:      {data.get('location', key_error_mesage)}\n"
 

@@ -36,6 +36,7 @@ async def read_web_app(
         return back
     for key in data.keys():
         context.user_data[key] = data[key]
+    return None
 
 
 '''async def send_to_google(
