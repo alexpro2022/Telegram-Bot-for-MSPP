@@ -128,15 +128,15 @@ def get_confirmation(data: dict) -> tuple[str, InlineKeyboardMarkup]:
 
     if constants.NEW_MENTOR in calling_func_name:
         text += surname + name + patronymic + occupation + email + phone + age + region + city + fund
-        callback_data_back = cbq.GET_NEW_MENTOR_FORM
-        callback_data_ahead = cbq.SEND_NEW_MENTOR_FORM
+        footer = [
+            get_args_back("Заполнить заново", cbq.GET_NEW_MENTOR_FORM),
+            (button_text.FINISH, cbq.SEND_NEW_MENTOR_FORM),
+        ]
     if constants.NEW_FUND in calling_func_name:
         text += surname + name + location + email + phone + fund + age
-        callback_data_back = cbq.GET_NEW_FUND_FORM
-        callback_data_ahead = cbq.SEND_NEW_FUND_FORM
-    footer = [
-        get_args_back("Заполнить заново", callback_data_back),
-        (button_text.FINISH, callback_data_ahead),
-    ]
+        footer = [
+            get_args_back("Заполнить заново", cbq.GET_NEW_FUND_FORM),
+            (button_text.FINISH, cbq.SEND_NEW_FUND_FORM),
+        ]
     keyboard = get_keyboard(footer=footer)
     return text, keyboard
