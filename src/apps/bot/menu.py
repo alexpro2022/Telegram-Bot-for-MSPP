@@ -1,3 +1,4 @@
+import inspect
 import logging
 
 from telegram import InlineKeyboardMarkup
@@ -106,7 +107,10 @@ def no_fund() -> tuple[str, InlineKeyboardMarkup]:
     return text, keyboard
 
 
-def get_confirmation(data: dict, form_for: str = constants.NEW_MENTOR) -> tuple[str, InlineKeyboardMarkup]:
+def get_confirmation(data: dict) -> tuple[str, InlineKeyboardMarkup]:
+    calling_func_name = inspect.stack()[1][3]
+    logger.info(f"confirmation for {calling_func_name}")
+
     key_error_mesage = "Test data"
     text = conversation.BOT_SPEAKING + "Твои данные будут отправлены:\n\n"
     surname = f"Фамилия:      {data.get('surname', key_error_mesage)}\n"
@@ -122,17 +126,17 @@ def get_confirmation(data: dict, form_for: str = constants.NEW_MENTOR) -> tuple[
     fund = f"Фонд:         {data.get('fund', key_error_mesage)}\n"
     location = f"Локация:      {data.get('location', key_error_mesage)}\n"
 
-    match form_for:
-        case constants.NEW_MENTOR:
-            text += surname + name + patronymic + occupation + email + phone + age + region + city + fund
-            callback_data = cbq.GET_NEW_MENTOR_FORM
-        case constants.NEW_FUND:
-            text += surname + name + location + email + phone + fund + age
-            callback_data = cbq.GET_NEW_FUND_FORM
-
+    if constants.NEW_MENTOR in calling_func_name:
+        text += surname + name + patronymic + occupation + email + phone + age + region + city + fund
+        callback_data_back = cbq.GET_NEW_MENTOR_FORM
+        callback_data_ahead = cbq.SEND_NEW_MENTOR_FORM
+    if constants.NEW_FUND in calling_func_name:
+        text += surname + name + location + email + phone + fund + age
+        callback_data_back = cbq.GET_NEW_FUND_FORM
+        callback_data_ahead = cbq.SEND_NEW_FUND_FORM
     footer = [
-        get_args_back("Заполнить заново", callback_data),
-        (button_text.FINISH, cbq.SEND_SPREADSHEET),
+        get_args_back("Заполнить заново", callback_data_back),
+        (button_text.FINISH, callback_data_ahead),
     ]
     keyboard = get_keyboard(footer=footer)
     return text, keyboard

@@ -1,3 +1,5 @@
+import inspect
+import logging
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -17,6 +19,13 @@ from apps.registration.utils import read_web_app, webapp
 from . import menu
 from .bot_settings import cbq, constants, conversation, emoji
 from .utils import bot_send_data, parse_data, reset_user_data
+
+logger = logging.getLogger(__name__)
+
+
+def __end_conversation() -> int:
+    logger.info(f"Application ended in {inspect.stack()[1][3]}")
+    return ConversationHandler.END
 
 
 async def backwards(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -41,7 +50,7 @@ async def check_age(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int |
     age = update.message.text
     if int(age) < constants.AGE_LIMIT:
         await bot_send_data(update, context, conversation.REFUSAL, backwards=False)
-        return ConversationHandler.END
+        return __end_conversation()
     context.user_data[constants.AGE] = age
     return await get_location(update, context)
 
@@ -91,6 +100,7 @@ async def get_funds_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 async def no_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await bot_send_data(update, context, *menu.no_fund())
+    return constants.NEW_FUND
 
 
 async def get_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -105,14 +115,15 @@ async def read_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await read_web_app(update, context)
     await bot_send_data(
         update, context,
-        *menu.get_confirmation(
-            context.user_data, form_for=constants.NEW_FUND), backwards=False)
-    # return ConversationHandler.END
+        *menu.get_confirmation(context.user_data), backwards=False)
+
+
+async def send_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    return __end_conversation()
 
 
 async def get_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data[constants.FUND] = parse_data(update, cbq.GET_NEW_MENTOR_FORM) or context.user_data[constants.FUND]
-    # context.user_data.get(constants.FUND, parse_data(update, cbq.GET_NEW_MENTOR_FORM))
     url = urljoin(settings.APPLICATION_URL, reverse('new_user', args=[
         context.user_data.get(constants.AGE),
         context.user_data.get(constants.REGION, ' '),
@@ -129,7 +140,10 @@ async def read_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYP
     return await bot_send_data(
         update, context,
         *menu.get_confirmation(context.user_data), backwards=False)
-    # return ConversationHandler.END
+
+
+async def send_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    return __end_conversation()
 
 
 HANDLERS = (
@@ -146,14 +160,14 @@ HANDLERS = (
                 CallbackQueryHandler(get_fund, cbq.GET_FUND),
                 CallbackQueryHandler(get_funds_info, cbq.GET_FUNDS_INFO),
                 CallbackQueryHandler(no_fund, cbq.NO_FUND),
-                # CallbackQueryHandler(get_new_fund_form, cbq.GET_NEW_FUND_FORM),
                 CallbackQueryHandler(get_new_mentor_form, cbq.GET_NEW_MENTOR_FORM),
-                # CallbackQueryHandler(send_to_google, cbq.SEND_SPREADSHEET),
                 MessageHandler(filters.StatusUpdate.WEB_APP_DATA, read_new_mentor_form),
+                CallbackQueryHandler(send_new_mentor_form, cbq.SEND_NEW_MENTOR_FORM),
             ],
             constants.NEW_FUND: [
                 CallbackQueryHandler(get_new_fund_form, cbq.GET_NEW_FUND_FORM),
                 MessageHandler(filters.StatusUpdate.WEB_APP_DATA, read_new_fund_form),
+                CallbackQueryHandler(send_new_fund_form, cbq.SEND_NEW_FUND_FORM),
             ],
         },
         fallbacks=[CommandHandler("start", greetings)],
