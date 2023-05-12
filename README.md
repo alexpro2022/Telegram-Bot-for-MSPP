@@ -76,7 +76,7 @@
 
 
 ## Создание и настройка аккаунта бота:
-<details><summary>Инструкции по установке</summary>
+<details><summary>Развернуть</summary>
 1. @BotFather — регистрирует аккаунты ботов в Telegram:
 
 Найдите в Telegram бота @BotFather: в окно поиска над списком контактов введите его имя.
@@ -109,6 +109,8 @@
 ## Установка и запуск:
 Удобно использовать принцип copy-paste - копировать команды из GitHub Readme и вставлять в командную строку Git Bash или IDE (например VSCode).
 ### Предварительные условия:
+<details><summary>Развернуть</summary>
+
 Предполагается, что пользователь:
   - создал [бота](#Создание-и-настройка-аккаунта-бота).
   - создал [сервисный аккаунт](https://support.google.com/a/answer/7378726?hl=en) на платформе Google Cloud и получил JSON-файл с информацией о своем сервисном аккаунте, его приватный ключ, ID и ссылки для авторизации. Эти данные будет необходимо указать в файле переменных окружения.
@@ -117,9 +119,9 @@
     ```
     docker --version && docker-compose --version
     ```
+</details>
 <hr>
-<details><summary>Локальный запуск: Docker Compose</summary> 
-
+<details><summary>Локальный запуск</summary> 
 
 **!!! Для пользователей Windows обязательно выполнить команду:** иначе файл start.sh при клонировании будет бракован:
 ```
@@ -162,9 +164,8 @@ docker compose -f infra/local/docker-compose.yml down
 docker compose -f infra/local/docker-compose.yml down -v
 ```
 При повторных запусках приложения может потребоваться реактивация ngrok-тоннеля и обновление переменной окружения DOMAIN (см. п.2)
-</details></details>
-<hr>
-<details><summary>Запуск на удаленном сервере: Docker Compose</summary>
+<hr></details>
+<details><summary>Запуск на удаленном сервере</summary>
 
 1. Создайте [домен](https://www.duckdns.org/domains) и привяжите его к публичному IP-адресу вашего удаленного сервера (введите его в поле current ip и кликните кнопку update ip).
 
