@@ -1,6 +1,5 @@
 from django.conf import settings
 
-
 if settings.EMOJI:
     BABY_ANGEL = " \U0001F47C "
     KIDS = " \U0001F467\U0001F466 "
