@@ -2,11 +2,12 @@ import logging
 
 from django.conf import settings
 from telegram.error import TelegramError
-from telegram.ext import Application
+from telegram.ext import Application, PicklePersistence
 
 from .handlers import HANDLERS
 
-bot_app = Application.builder().token(settings.TELEGRAM_TOKEN).build()
+persistence = PicklePersistence(filepath="conversationbot")
+bot_app = Application.builder().token(settings.TELEGRAM_TOKEN).persistence(persistence).build()
 bot_app.add_handlers(HANDLERS)
 logger = logging.getLogger(__name__)
 

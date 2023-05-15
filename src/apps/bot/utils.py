@@ -94,6 +94,9 @@ async def bot_send_data(
             reply_markup=keyboard,
         )
     elif update.callback_query is not None:
+        # CallbackQueries need to be answered, even if no notification to the user is needed
+        # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
+        await update.callback_query.answer()
         await update.callback_query.edit_message_text(
             text.format(update.callback_query.from_user.first_name),
             reply_markup=keyboard,

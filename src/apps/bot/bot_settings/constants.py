@@ -1,27 +1,24 @@
-AGE = "age"
-AGE_LIMIT = 18
+# Constants (reserved 100-199)
+(
+    AGE,
+    LOCATION,
+    COUNTRY,
+    REGION,
+    CITY,
+    CITY_OR_AND_FUND,
+    FUND,
+    FUND_INFO,
+    NO_FUND,
+    NEW_FUND,
+    NEW_FUND_FORM,
+    NEW_MENTOR,
+    CACHE,
+    MAIN_CONVERSATION,
+) = map(chr, range(100, 114))
 
-LOCATION = "location"
+AGE_LIMIT = 18
 MSK = "Москва"
 MSK_REG = "Московская область"
 SPB = "Санкт-Петербург"
-TWO_CAPITALS = (MSK, MSK_REG, SPB)
-
-REGION = "region"
-
-COUNTRY = "country"
 KAZ = "Казахстан"
-
-CITY = "city"
-CITY_OR_AND_FUND = "city_or_and_fund"
-NO_CITY = "Нет моего города"
-
-FUND = "fund"
-FUND_INFO = "fund_info"
-NO_FUND = "no_fund"
-NEW_FUND = "new_fund"
-NEW_FUND_FORM = "new_fund_form"
-
-MAIN_CONVERSATION = "Главная ветка беседы"
-NEW_MENTOR = "new_mentor"
-CACHE = "cache"
+TWO_CAPITALS = (MSK, MSK_REG, SPB)

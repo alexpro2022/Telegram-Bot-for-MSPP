@@ -108,6 +108,12 @@ def no_fund() -> tuple[str, InlineKeyboardMarkup]:
 
 
 def get_confirmation(data: dict) -> tuple[str, InlineKeyboardMarkup]:
+    def get_footer(backward, forward):
+        return [
+            get_args_back("Заполнить заново", backward),
+            (button_text.FINISH, forward),
+        ]
+
     calling_func_name = inspect.stack()[1][3]
     logger.info(f"confirmation for {calling_func_name}")
 
@@ -126,17 +132,12 @@ def get_confirmation(data: dict) -> tuple[str, InlineKeyboardMarkup]:
     fund = f"Фонд:         {data.get('fund', key_error_mesage)}\n"
     location = f"Локация:      {data.get('location', key_error_mesage)}\n"
 
-    if constants.NEW_MENTOR in calling_func_name:
+    if "mentor" in calling_func_name:
         text += surname + name + patronymic + occupation + email + phone + age + region + city + fund
-        footer = [
-            get_args_back("Заполнить заново", cbq.GET_NEW_MENTOR_FORM),
-            (button_text.FINISH, cbq.SEND_NEW_MENTOR_FORM),
-        ]
-    if constants.NEW_FUND in calling_func_name:
+        footer = get_footer(cbq.GET_NEW_MENTOR_FORM, cbq.SEND_NEW_MENTOR_FORM)
+    if "fund" in calling_func_name:
         text += surname + name + location + email + phone + fund + age
-        footer = [
-            get_args_back("Заполнить заново", cbq.GET_NEW_FUND_FORM),
-            (button_text.FINISH, cbq.SEND_NEW_FUND_FORM),
-        ]
+        footer = get_footer(cbq.GET_NEW_FUND_FORM, cbq.SEND_NEW_FUND_FORM)
+
     keyboard = get_keyboard(footer=footer)
     return text, keyboard

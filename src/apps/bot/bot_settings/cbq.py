@@ -1,14 +1,16 @@
-# CallBack Query data =======================================================
-GET_AGE = "get_age"
-GET_LOCATION = "get_location"
-GET_COUNTRY = "get_country"
-GET_REGION = "get_region"
-GET_CITY_OR_AND_FUND = "get_what"
-GET_FUND = "get_fund"
-GET_FUNDS_INFO = "funds_info"
-NO_FUND = "no_fund"
-GET_NEW_FUND_FORM = "new_fund"
-GET_NEW_MENTOR_FORM = "ment"
-SEND_NEW_MENTOR_FORM = "send_new_mentor_form"
-SEND_NEW_FUND_FORM = "send_new_fund_form"
-GO_BACK = "go_back"
+# CallBack Query data (reserved 0-99)
+(
+    GET_AGE,
+    GET_LOCATION,
+    GET_COUNTRY,
+    GET_REGION,
+    GET_CITY_OR_AND_FUND,
+    GET_FUND,
+    GET_FUNDS_INFO,
+    NO_FUND,
+    GET_NEW_FUND_FORM,
+    GET_NEW_MENTOR_FORM,
+    SEND_NEW_MENTOR_FORM,
+    SEND_NEW_FUND_FORM,
+    GO_BACK,
+) = map(chr, range(13))

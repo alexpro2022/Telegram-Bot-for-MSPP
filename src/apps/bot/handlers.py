@@ -171,5 +171,7 @@ HANDLERS = (
             ],
         },
         fallbacks=[CommandHandler("start", greetings)],
+        name="mspp_bot_conversation",
+        persistent=True,
     ),
 )

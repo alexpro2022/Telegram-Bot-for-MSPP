@@ -24,6 +24,7 @@
 [![Python](https://img.shields.io/badge/Python-v3.11-blue?logo=python)](https://www.python.org/)
 [![python-telegram-bot](https://img.shields.io/badge/python--telegram--bot-v20.1-blue?)](https://docs.python-telegram-bot.org/en/stable/index.html)
 [![asyncio](https://img.shields.io/badge/-asyncio-464646?logo=)](https://docs.python.org/3/library/asyncio.html)
+[![environ](https://img.shields.io/badge/-environ-464646?logo=)](https://pypi.org/project/python-environ/)
 [![logging](https://img.shields.io/badge/-logging-464646?logo=)](https://docs.python.org/3/library/logging.html)
 [![typing](https://img.shields.io/badge/-typing-464646?logo=)](https://docs.python.org/3/library/typing.html)
 [![uvicorn](https://img.shields.io/badge/-uvicorn-464646?logo=Uvicorn)](https://www.uvicorn.org/)
