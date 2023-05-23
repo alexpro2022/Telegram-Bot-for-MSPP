@@ -1,15 +1,32 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
-from .bot_settings import cbq, constants, emoji
+from .bot_settings import button_text, cbq, constants, emoji
 
 
-def get_args_back(
-    text: str = "Назад",
+# Standard button's arguments
+def get_args_back_button(
+    text: str = button_text.BACK_BUTTON,
     callback_query: str = cbq.GO_BACK,
     sign: str = emoji.GO_BACK,
 ) -> tuple[str, str]:
     return sign + text, callback_query
+
+
+def get_args_prev_menu_button(
+    text: str = button_text.PREV_MENU_BUTTON,
+    callback_query: str = cbq.GO_PREV_MENU,
+    sign: str = emoji.PREV_MENU,
+) -> tuple[str, str]:
+    return sign + text, callback_query
+
+
+def get_args_next_menu_button(
+    text: str = button_text.NEXT_MENU_BUTTON,
+    callback_query: str = cbq.GO_NEXT_MENU,
+    sign: str = emoji.NEXT_MENU,
+) -> tuple[str, str]:
+    return text + sign, callback_query
 
 
 # BUTTONS ====================================================================
@@ -36,8 +53,8 @@ def get_keyboard(
     *,
     header: list[tuple[str, str]] = None,
     footer: list[tuple[str, str]] = None,
+    keyboard: list = None,
     markup: bool = True,
-    keyboard: list = None
 ) -> InlineKeyboardMarkup | list | None:
     if keyboard is not None:
         return InlineKeyboardMarkup(keyboard)
@@ -117,6 +134,7 @@ def reset_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, step: st
             context.user_data.clear()
             context.user_data[constants.COUNTRY] = "Россия"
             context.user_data[constants.AGE] = temp
+            context.user_data[constants.REGION_CURRENT_PAGE] = 1
         case constants.REGION:
             context.user_data.pop(constants.REGION, '')
         case constants.CITY_OR_AND_FUND:

@@ -13,4 +13,6 @@
     SEND_NEW_MENTOR_FORM,
     SEND_NEW_FUND_FORM,
     GO_BACK,
-) = map(chr, range(13))
+    GO_PREV_MENU,
+    GO_NEXT_MENU,
+) = map(chr, range(15))

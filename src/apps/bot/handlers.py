@@ -66,7 +66,11 @@ async def get_country(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 async def get_region(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     reset_user_data(update, context, constants.REGION)
-    await bot_send_data(update, context, *await menu.get_region())
+    if update.callback_query.data.startswith(cbq.GO_PREV_MENU):
+        context.user_data[constants.REGION_CURRENT_PAGE] -= 1
+    elif update.callback_query.data.startswith(cbq.GO_NEXT_MENU):
+        context.user_data[constants.REGION_CURRENT_PAGE] += 1
+    await bot_send_data(update, context, *await menu.get_region(context))
 
 
 async def get_city_or_and_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -154,7 +158,8 @@ HANDLERS = (
                 CallbackQueryHandler(backwards, cbq.GO_BACK),
                 CallbackQueryHandler(get_age, cbq.GET_AGE),
                 MessageHandler(filters.Regex(r"^\d{1,3}$"), check_age),
-                CallbackQueryHandler(get_region, cbq.GET_REGION),
+                CallbackQueryHandler(get_location, cbq.GET_LOCATION),
+                CallbackQueryHandler(get_region, f"{cbq.GET_REGION}|{cbq.GO_PREV_MENU}|{cbq.GO_NEXT_MENU}"),
                 CallbackQueryHandler(get_country, cbq.GET_COUNTRY),
                 CallbackQueryHandler(get_city_or_and_fund, cbq.GET_CITY_OR_AND_FUND),
                 CallbackQueryHandler(get_fund, cbq.GET_FUND),

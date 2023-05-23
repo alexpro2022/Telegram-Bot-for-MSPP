@@ -22,3 +22,8 @@ FUNDS_INFO = "Про фонды" + emoji.BOOK
 NEW_FUND = "Да, давай" + emoji.OK
 
 FILL_FORM = "Заполнить анкету " + emoji.WRITING_HAND
+
+BACK_BUTTON = "Назад"
+FWD_BUTTON = "Вперед"
+PREV_MENU_BUTTON = "Prev menu page"
+NEXT_MENU_BUTTON = "Next menu page"

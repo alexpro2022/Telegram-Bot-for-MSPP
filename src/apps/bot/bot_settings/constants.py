@@ -4,6 +4,7 @@
     LOCATION,
     COUNTRY,
     REGION,
+    REGION_CURRENT_PAGE,
     CITY,
     CITY_OR_AND_FUND,
     FUND,
@@ -14,7 +15,7 @@
     NEW_MENTOR,
     CACHE,
     MAIN_CONVERSATION,
-) = map(chr, range(100, 114))
+) = map(chr, range(100, 115))
 
 AGE_LIMIT = 18
 MSK = "Москва"

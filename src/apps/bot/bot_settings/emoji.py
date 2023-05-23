@@ -5,6 +5,9 @@ if settings.EMOJI:
     KIDS = " \U0001F467\U0001F466 "
 
     OK = " \U0001F44D "
+
+    PREV_MENU = " \U0001F446 "
+    NEXT_MENU = " \U0001F447 "
     PRESS_BUTTON = " \U0001F447 "
     GO_BACK = " \U0001F448 "
     GO_AHEAD = " \U0001F449 "

@@ -156,3 +156,5 @@ logging.basicConfig(
     ]
 )
 EMOJI = env("EMOJI", default=True)
+
+MENU_ITEMS_PER_PAGE = 5

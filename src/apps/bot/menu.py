@@ -1,11 +1,14 @@
 import inspect
 import logging
+# from typing import Union
 
+from django.conf import settings
+from django.core.paginator import Paginator
 from telegram import InlineKeyboardMarkup
+from telegram.ext import ContextTypes
 
 from .bot_settings import button_text, cbq, constants, conversation
-# from .models import CoverageArea, Fund
-from .utils import add_footer, get_args_back, get_button, get_keyboard
+from .utils import add_footer, get_args_back_button, get_args_next_menu_button, get_args_prev_menu_button, get_button, get_keyboard
 
 logger = logging.getLogger(__name__)
 
@@ -33,21 +36,31 @@ def get_country() -> tuple[str, InlineKeyboardMarkup | list | None]:
         (button_text.KAZ, cbq.GET_FUND + constants.KAZ),
         (button_text.OTHER_COUNTRY, cbq.NO_FUND),
     ]
-    footer = [get_args_back("В начало")]
+    footer = [get_args_back_button("В начало")]
     keyboard = get_keyboard(buttons, footer=footer)
     return text, keyboard
 
 
-async def get_region(parent_country: str = "Россия") -> tuple[str, InlineKeyboardMarkup | list | None]:
+async def get_region(
+    context: ContextTypes.DEFAULT_TYPE, parent_country: str = "Россия"
+) -> tuple[str, InlineKeyboardMarkup | list | None]:
     from .models import CoverageArea
     text = conversation.CHOOSE_REGION + parent_country
-    buttons = [
+    buttons = Paginator([
         (region.name, cbq.GET_CITY_OR_AND_FUND + region.name)
         async for region in CoverageArea.objects.filter(level=1)
-        if region.name not in constants.TWO_CAPITALS
-    ]
-    footer = [get_args_back("В начало"), (button_text.NO_MY_REGION, cbq.NO_FUND)]
-    keyboard = get_keyboard(buttons, footer=footer)
+        if region.name not in constants.TWO_CAPITALS],
+        settings.MENU_ITEMS_PER_PAGE,
+    )
+    header = [get_args_prev_menu_button(), get_args_next_menu_button()]
+    if context.user_data[constants.REGION_CURRENT_PAGE] <= 1:
+        context.user_data[constants.REGION_CURRENT_PAGE] = 1
+        header = [get_args_next_menu_button()]
+    elif context.user_data[constants.REGION_CURRENT_PAGE] >= buttons.num_pages:
+        context.user_data[constants.REGION_CURRENT_PAGE] = buttons.num_pages
+        header = [get_args_prev_menu_button()]
+    footer = [get_args_back_button("В начало", cbq.GET_LOCATION), (button_text.NO_MY_REGION, cbq.NO_FUND)]
+    keyboard = get_keyboard(buttons.get_page(context.user_data[constants.REGION_CURRENT_PAGE]), header=header, footer=footer)
     return text, keyboard
 
 
@@ -58,7 +71,7 @@ async def get_city(parent_region: str, markup: bool = True) -> tuple[str, Inline
         (city.name, cbq.GET_FUND + city.name)
         async for city in CoverageArea.objects.filter(parent__name=parent_region)
     ]
-    footer = [get_args_back("Изменить регион"), (button_text.NO_MY_CITY, cbq.NO_FUND)]
+    footer = [get_args_back_button("Изменить регион"), (button_text.NO_MY_CITY, cbq.NO_FUND)]
     keyboard = get_keyboard(buttons, footer=footer, markup=markup)
     return text, keyboard
 
@@ -74,7 +87,7 @@ async def get_fund(
     )]
     buttons = [(fund.name, cbq.GET_NEW_MENTOR_FORM + fund.name) for fund in funds]
     footer = [
-        get_args_back("Изменить город"),
+        get_args_back_button("Изменить город"),
         (button_text.FUNDS_INFO, cbq.GET_FUNDS_INFO)
     ] if markup else None
     keyboard = get_keyboard(buttons, footer=footer, markup=markup)
@@ -83,7 +96,7 @@ async def get_fund(
 
 
 async def get_city_or_and_fund(parent_region: str, age: str) -> tuple[str, InlineKeyboardMarkup]:
-    back_button = get_args_back("Изменить город")
+    back_button = get_args_back_button("Изменить город")
     funds_info_button = (button_text.FUNDS_INFO, cbq.GET_FUNDS_INFO)
     text_cities, keyboard_cities = await get_city(parent_region, markup=False)
     text_funds, keyboard_funds, descriptions = await get_fund(parent_region, age, markup=False)
@@ -102,15 +115,16 @@ async def get_city_or_and_fund(parent_region: str, age: str) -> tuple[str, Inlin
 
 def no_fund() -> tuple[str, InlineKeyboardMarkup]:
     text = conversation.NO_FUND_MESSAGE
-    footer = [get_args_back(), (button_text.NEW_FUND, cbq.GET_NEW_FUND_FORM)]
+    footer = [get_args_back_button(), (button_text.NEW_FUND, cbq.GET_NEW_FUND_FORM)]
     keyboard = get_keyboard(footer=footer)
     return text, keyboard
 
 
 def get_confirmation(data: dict) -> tuple[str, InlineKeyboardMarkup]:
+
     def get_footer(backward, forward):
         return [
-            get_args_back("Заполнить заново", backward),
+            get_args_back_button("Заполнить заново", backward),
             (button_text.FINISH, forward),
         ]
 
