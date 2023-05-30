@@ -143,7 +143,7 @@ ngrok http 80
 ```
 git clone https://github.com/alexpro2022/Telegram-Bot-for-MSPP.git && \
 cd Telegram-Bot-for-MSPP && \
-cp env_example .env && \
+cp .env_example .env && \
 nano .env
 ```
 Для работы бота необходимо задать значения минимум трем переменным окружения: TELEGRAM_BOT_TOKEN, DOMAIN, WEBHOOK_MODE.
