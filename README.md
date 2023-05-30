@@ -119,7 +119,7 @@
   - создал [сервисный аккаунт](https://support.google.com/a/answer/7378726?hl=en) на платформе Google Cloud и получил JSON-файл с информацией о своем сервисном аккаунте, его приватный ключ, ID и ссылки для авторизации. Эти данные будет необходимо указать в файле переменных окружения.
  - создал аккаунт [DockerHub](https://hub.docker.com/), если запуск будет производиться на удаленном сервере.
  - установил [Docker](https://docs.docker.com/engine/install/) и [Docker Compose](https://docs.docker.com/compose/install/) на локальной машине или на удаленном сервере, где проект будет запускаться в контейнерах. Проверить наличие можно выполнив команды:
-    ```
+    ```bash
     docker --version && docker-compose --version
     ```
 </details>
@@ -127,20 +127,20 @@
 <details><summary>Локальный запуск</summary> 
 
 **!!! Для пользователей Windows обязательно выполнить команду:** иначе файл start.sh при клонировании будет бракован:
-```
+```bash
 git config --global core.autocrlf false
 ```
 
 1. Установите [ngrok](https://ngrok.com/download).
 
 2. Активируйте тоннель для https соединения командой:
-```
+```bash
 ngrok http 80
 ``` 
 В поле Forwarding первым элементом будет указано значение вида `https://ebd6-188-170-76-51.ngrok-free.app`, которое необходимо указать в переменной окружения DOMAIN (можно как с протоколом `https://` , так и без него) (см. п.3)
 
 3. Клонируйте репозиторий с GitHub и в .env-файле введите данные для переменных окружения (значения даны для примера, но их можно оставить; подсказки даны в комментариях):
-```
+```bash
 git clone https://github.com/alexpro2022/Telegram-Bot-for-MSPP.git && \
 cd Telegram-Bot-for-MSPP && \
 cp .env_example .env && \
@@ -148,22 +148,22 @@ nano .env
 ```
 Для работы бота необходимо задать значения минимум трем переменным окружения: TELEGRAM_BOT_TOKEN, DOMAIN, WEBHOOK_MODE.
 По умолчанию режим работы бота - polling. Этот режим удобен для первоначальной отладки бота, но в дальнейшем придется перейти на режим работы - webhook. Для этого задайте значение:
-```
+```bash
 WEBHOOK_MODE=True
 ```
 
 4. Из корневой директории проекта выполните команду:
-```
+```bash
 docker compose -f infra/local/docker-compose.yml up -d --build
 ```
 Проект будет развернут в трех docker-контейнерах (db, web, nginx) по адресу http://localhost.
 
 5. Остановить docker и удалить контейнеры можно командой из корневой директории проекта:
-```
+```bash
 docker compose -f infra/local/docker-compose.yml down
 ```
 Если также необходимо удалить тома базы данных и статики:
-```
+```bash
 docker compose -f infra/local/docker-compose.yml down -v
 ```
 При повторных запусках приложения может потребоваться реактивация ngrok-тоннеля и обновление переменной окружения DOMAIN (см. п.2)
@@ -175,7 +175,7 @@ docker compose -f infra/local/docker-compose.yml down -v
 2. Сделайте [форк](https://docs.github.com/en/get-started/quickstart/fork-a-repo) в свой репозиторий.
 
 3. Создайте Actions.Secrets согласно списку ниже (значения указаны для примера) + переменные окружения из env_example файла:
-```
+```py
 PROJECT_NAME=mspp-bot
 SECRET_KEY
 
@@ -209,12 +209,12 @@ POSTGRES_PASSWORD=12345
 При первом запуске будут автоматически произведены следующие действия:    
   * выполнены миграции БД
   * БД заполнена начальными данными
-  * создан суперюзер (пользователь с правами админа) с учетными данными из переменных окружения DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD.
+  * создан суперюзер (пользователь с правами админа) с учетными данными из переменных окружения `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL`, `DJANGO_SUPERUSER_PASSWORD`.
   * собрана статика
 
-Вход в админ-зону осуществляется по адресу: http://hostname/admin/ , где hostname:
-  * localhost
-  * Доменное имя удаленного сервера, например mspp-bot.duckdns.org
+Вход в админ-зону осуществляется по адресу: `http://hostname/admin/` , где `hostname`:
+  * `localhost`
+  * Доменное имя удаленного сервера, например `mspp-bot.duckdns.org`
 
 [⬆️Оглавление](#оглавление)
 
@@ -230,7 +230,7 @@ POSTGRES_PASSWORD=12345
 
 ## Удаление:
 Для удаления проекта выполните команду (дважды - если вы в папке results):
-```
+```bash
 cd .. && rm -fr Telegram-Bot-for-MSPP
 ```
 
