@@ -141,7 +141,7 @@ ngrok http 80
 
 3. Клонируйте репозиторий с GitHub и в .env-файле введите данные для переменных окружения (значения даны для примера, но их можно оставить; подсказки даны в комментариях):
 ```
-git clone https://github.com:alexpro2022/Telegram-Bot-for-MSPP.git && \
+git clone https://github.com/alexpro2022/Telegram-Bot-for-MSPP.git && \
 cd Telegram-Bot-for-MSPP && \
 cp env_example .env && \
 nano .env
