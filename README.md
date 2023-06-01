@@ -244,6 +244,10 @@ cd .. && rm -fr Telegram-Bot-for-MSPP
 
 [Aleksei Proskuriakov](https://github.com/alexpro2022)
 
+	* написал приложение registration для отображения форм регистрации нового наставника и нового фонда, использовал HTML, CSS для отображения форм в telegram webapp и JavaScript для real-time валидации полей форм.
+	* подключил doker-образ SWAG для получения SSL-сертификата (https соединение для webapp и webhook)
+	* написал функционал обработчиков беседы бота и навигации
+
 [⬆️В начало](#Проект-MSPP)
 
 
