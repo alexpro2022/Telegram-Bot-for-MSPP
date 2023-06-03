@@ -16,18 +16,20 @@ const errMsgTextInput = {
   max: "Допускается ввод не более 100 символов",
   capsPattern: "Убедитесь, что у Вас выключен CAPS LOCK",
 };
+
+const errMsgLocFund = {
+  required: "Пожалуйста, укажите название - допускаются любые буквы (для региона/города только кириллица), цифры, дефис и пробел",
+  min: "Введите не менее 2 символов",
+  max: "Допускается ввод не более 100 символов",
+}
   
 const errMsg = {
   surname: errMsgTextInput,    
   name: errMsgTextInput,
   patronimic: errMsgTextInput,      
   occupation: errMsgTextInput,
-  location: errMsgTextInput,   
-  fund: {
-    required: "Пожалуйста, укажите название фонда, допускаются любые буквы, цифры и знак пробела",
-    min: "Введите не менее 2 символов",
-    max: "Допускается ввод не более 100 символов",
-  },             
+  location: errMsgLocFund,   
+  fund: errMsgLocFund,             
   email: {
     required: "Пожалуйста, укажите адрес электронной почты, допустимые символы [a-z 0-9 _ @ .]",
     min: "Введите не менее 5 символов",
@@ -66,13 +68,13 @@ const checkInputValidity = (element, errElement) => {
     isCapitalize = false;
     break;
    case "fund":
-    not_allowed_simbols = /[^А-Яа-я\w\s]/
+    not_allowed_simbols = /[^А-Яа-я-\w\s]/
     isCapitalize = false;
     break;
    case "location":
-    not_allowed_simbols = /[^А-Яа-я\s]/
-    isCapitalize = true;
-    break;    
+    not_allowed_simbols = /[^А-Яа-я-\s]/
+    isCapitalize = false;
+    break;   
    default:
     not_allowed_simbols = /[^А-Яа-я]/;
     isCapitalize = true;    

@@ -1,7 +1,11 @@
+import logging
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
 from .bot_settings import button_text, cbq, constants, emoji
+
+logger = logging.getLogger(__name__)
 
 
 # Standard button's arguments
@@ -148,16 +152,23 @@ def reset_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, step: st
                 context.user_data.pop(constants.REGION, '')
 
 
-'''
-async def remove_keyboard(update: Update, text: str = "") -> str:
-    await update.message.reply_text(text, reply_markup=ReplyKeyboardRemove())
+def get_values_for(what: str, data: dict) -> list:
+    """Returns a list of values to be sent to Google spreadsheet.
+       Param 'what' is expected to be either 'fund' or 'mentor'.
+       Raises AssertionError otherwise.
+    """
+    assert what in ('fund', 'mentor'), 'Wrong parameter "what" = {what}'
+    common_keys1 = ['surname', 'name']
+    common_keys2 = ['email', 'phone_number', constants.AGE]
+    common_keys3 = [constants.FUND]
+    mentor_keys = common_keys1 + ['patronimic', 'occupation'] + common_keys2 \
+        + [constants.REGION, constants.CITY] + common_keys3
+    logger.info(f'=== mentor_keys={mentor_keys}')
+    fund_keys = common_keys1 + common_keys2 + ['location'] + common_keys3
+    logger.info(f'=== fund_keys={fund_keys}')
 
-
-# Callback_data checkers =====================================================
-def is_city_requested(callback_data: str) -> bool:
-    return callback_data.startswith(cbq.GET_CITY)
-
-
-def is_fund_requested(callback_data: str) -> bool:
-    return callback_data.startswith(cbq.GET_FUND)
-'''
+    match what:
+        case 'fund':
+            return [data.get(key) for key in fund_keys]
+        case 'mentor':
+            return [data.get(key) for key in mentor_keys]

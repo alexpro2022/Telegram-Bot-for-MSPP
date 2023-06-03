@@ -1,14 +1,19 @@
 import inspect
 import logging
-# from typing import Union
 
 from django.conf import settings
 from django.core.paginator import Paginator
 from telegram import InlineKeyboardMarkup
-from telegram.ext import ContextTypes
 
 from .bot_settings import button_text, cbq, constants, conversation
-from .utils import add_footer, get_args_back_button, get_args_next_menu_button, get_args_prev_menu_button, get_button, get_keyboard
+from .utils import (
+    add_footer,
+    get_args_back_button,
+    get_args_next_menu_button,
+    get_args_prev_menu_button,
+    get_button,
+    get_keyboard,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -41,9 +46,7 @@ def get_country() -> tuple[str, InlineKeyboardMarkup | list | None]:
     return text, keyboard
 
 
-async def get_region(
-    context: ContextTypes.DEFAULT_TYPE, parent_country: str = "Россия"
-) -> tuple[str, InlineKeyboardMarkup | list | None]:
+async def get_region(page: int, parent_country: str = "Россия") -> tuple[str, InlineKeyboardMarkup | list | None]:
     from .models import CoverageArea
     text = conversation.CHOOSE_REGION + parent_country
     buttons = Paginator([
@@ -52,15 +55,14 @@ async def get_region(
         if region.name not in constants.TWO_CAPITALS],
         settings.MENU_ITEMS_PER_PAGE,
     )
-    header = [get_args_prev_menu_button(), get_args_next_menu_button()]
-    if context.user_data[constants.REGION_CURRENT_PAGE] <= 1:
-        context.user_data[constants.REGION_CURRENT_PAGE] = 1
+    if page <= 1:
         header = [get_args_next_menu_button()]
-    elif context.user_data[constants.REGION_CURRENT_PAGE] >= buttons.num_pages:
-        context.user_data[constants.REGION_CURRENT_PAGE] = buttons.num_pages
+    elif page >= buttons.num_pages:
         header = [get_args_prev_menu_button()]
+    else:
+        header = [get_args_prev_menu_button(), get_args_next_menu_button()]
     footer = [get_args_back_button("В начало", cbq.GET_LOCATION), (button_text.NO_MY_REGION, cbq.NO_FUND)]
-    keyboard = get_keyboard(buttons.get_page(context.user_data[constants.REGION_CURRENT_PAGE]), header=header, footer=footer)
+    keyboard = get_keyboard(buttons.get_page(page), header=header, footer=footer)
     return text, keyboard
 
 
@@ -121,37 +123,35 @@ def no_fund() -> tuple[str, InlineKeyboardMarkup]:
 
 
 def get_confirmation(data: dict) -> tuple[str, InlineKeyboardMarkup]:
-
     def get_footer(backward, forward):
         return [
             get_args_back_button("Заполнить заново", backward),
             (button_text.FINISH, forward),
         ]
 
+    error_mesage = "KEY_ERROR"
+    text = conversation.CONFIRMATION_MESSAGE
+    surname = f"Фамилия:      {data.get('surname', error_mesage)}\n"
+    name = f"Имя:          {data.get('name', error_mesage)}\n"
+    patronymic = f"Отчество:     {data.get('patronimic', error_mesage)}\n"
+    occupation = f"Профессия:    {data.get('occupation', error_mesage)}\n"
+    email = f"E-mail:       {data.get('email', error_mesage)}\n"
+    phone = f"Телефон:      {data.get('phone_number', error_mesage)}\n"
+    age = f"Возраст:      {data.get(constants.AGE, error_mesage)}\n"
+    region = f"Регион:       {data.get(constants.REGION, ' ')}\n"
+    city = f"Город:        {data.get(constants.CITY, ' ')}\n"
+    fund = f"Фонд:         {data.get(constants.FUND, error_mesage)}\n"
+    location = f"Локация:      {data.get('location', error_mesage)}\n"
+
     calling_func_name = inspect.stack()[1][3]
-    logger.info(f"confirmation for {calling_func_name}")
-
-    key_error_mesage = "Test data"
-    text = conversation.BOT_SPEAKING + "Твои данные будут отправлены:\n\n"
-    surname = f"Фамилия:      {data.get('surname', key_error_mesage)}\n"
-    name = f"Имя:          {data.get('name', key_error_mesage)}\n"
-    patronymic = f"Отчество:     {data.get('patronimic', key_error_mesage)}\n"
-    occupation = f"Профессия:    {data.get('occupation', key_error_mesage)}\n"
-    email = f"E-mail:       {data.get('email', key_error_mesage)}\n"
-    phone = f"Телефон:      {data.get('phone_number', key_error_mesage)}\n"
-    age = f"Возраст:      {data.get('age', key_error_mesage)}\n"
-    region = f"Регион:       {data.get('region', ' ')}\n"
-    city = f"Город:        {data.get('city', ' ')}\n"
-    # country =
-    fund = f"Фонд:         {data.get('fund', key_error_mesage)}\n"
-    location = f"Локация:      {data.get('location', key_error_mesage)}\n"
-
     if "mentor" in calling_func_name:
         text += surname + name + patronymic + occupation + email + phone + age + region + city + fund
         footer = get_footer(cbq.GET_NEW_MENTOR_FORM, cbq.SEND_NEW_MENTOR_FORM)
-    if "fund" in calling_func_name:
+    elif "fund" in calling_func_name:
         text += surname + name + location + email + phone + fund + age
         footer = get_footer(cbq.GET_NEW_FUND_FORM, cbq.SEND_NEW_FUND_FORM)
+    else:
+        raise ValueError("Wrong calling_func_name = {calling_func_name}")
 
     keyboard = get_keyboard(footer=footer)
     return text, keyboard

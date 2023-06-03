@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     "mptt",
     "registration",
     "bot.apps.BotConfig",
-    "core",
 ]
 
 MIDDLEWARE = [
@@ -107,16 +106,43 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Telegram
 TELEGRAM_TOKEN = env("TELEGRAM_BOT_TOKEN", default="")
 WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
-WEBHOOK_URL = APPLICATION_URL
 WEBHOOK_URL = urljoin(APPLICATION_URL, "bot/")
 
 # Google
 CREDENTIALS_TYPE = env("CREDENTIALS_TYPE", default="env")
 SPREADSHEETS_URL = "https://docs.google.com/spreadsheets/d/{0}"
-SPREADSHEET_ID = env("SPREADSHEET_ID", default="_")
-SCOPES = ("https://www.googleapis.com/auth/spreadsheets",)
+FUNDS_SPREADSHEET_ID = env("FUNDS_SPREADSHEET_ID", default="_")
+MENTORS_SPREADSHEET_ID = env("MENTORS_SPREADSHEET_ID", default="_")
 
-GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/d/e/{0}/formResponse"
+ENV_INFO = {
+    "project_id": env("PROJECT_ID", default="_"),
+    "private_key_id": env("PRIVATE_KEY_ID", default="_"),
+    "private_key": env.str("PRIVATE_KEY", multiline=True, default="_"),
+    "client_email": env("CLIENT_EMAIL", default="_"),
+    "client_id": env("CLIENT_ID", default="_"),
+    "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
+}
+GOOGLE_ENV_VARS = {
+    "funds_spreadsheet_id": FUNDS_SPREADSHEET_ID,
+    "mentors_spreadsheet_id": MENTORS_SPREADSHEET_ID,
+    **ENV_INFO,
+}
+SCOPES = ("https://www.googleapis.com/auth/spreadsheets",
+          "https://www.googleapis.com/auth/drive")
+TYPE = "Service_account"
+AUTH_URI = "https://accounts.google.com/o/oauth2/auth"
+TOKEN_URI = "https://oauth2.googleapis.com/token"
+AUTH_PROVIDER_X509_CERT_URL = "https://www.googleapis.com/oauth2/v1/certs"
+INFO = {
+    "type": TYPE,
+    "auth_uri": AUTH_URI,
+    "token_uri": TOKEN_URI,
+    "auth_provider_x509_cert_url": AUTH_PROVIDER_X509_CERT_URL,
+    **ENV_INFO,
+    "scopes": SCOPES,
+}
+
+'''GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/d/e/{0}/formResponse"
 GOOGLE_FORM_ID = "1FAIpQLSdyfRyOfDfB3X75eEQoTOgBA8bGfe68Lthy-03EdwnnE_U9QA"
 GOOGLE_FORM_FIELDS = {
     "surname": "50190039",
@@ -130,18 +156,9 @@ GOOGLE_FORM_FIELDS = {
     "email": "894713360",
     "phone": "1686121456",
     "fund_name": "802736698",
-}
+}'''
 
-EMAIL_USER = env("EMAIL", default="example@mail.com")
-PRIVATE_KEY = env.str("PRIVATE_KEY", multiline=True, default="_")
-ENV_INFO = {
-    "project_id": env("PROJECT_ID", default="_"),
-    "private_key_id": env("PRIVATE_KEY_ID", default="_"),
-    "private_key": PRIVATE_KEY,
-    "client_email": env("CLIENT_EMAIL", default="_"),
-    "client_id": env("CLIENT_ID", default="_"),
-    "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
-}
+EMAIL = env("EMAIL", default="example@mail.com")
 
 LOGGING_LEVEL = env("LOGGING_LEVEL", default="INFO")
 LOG_DIR = BASE_DIR / "logs"
@@ -155,6 +172,7 @@ logging.basicConfig(
         logging.FileHandler(LOGGING_FILENAME, encoding='utf-8'),
     ]
 )
+
 EMOJI = env("EMOJI", default=True)
 
 MENU_ITEMS_PER_PAGE = 5
