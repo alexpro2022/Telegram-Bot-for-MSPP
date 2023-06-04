@@ -6,7 +6,6 @@ from telegram.ext import ContextTypes
 
 from apps.bot.bot_settings import button_text, constants, conversation
 from apps.bot.utils import add_backwards, bot_send_data
-from apps.google.utils import warning_no_google
 
 logger = logging.getLogger(__name__)
 
@@ -15,16 +14,11 @@ async def webapp(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     url: str,
-    message_text: str = conversation.PRESS_BUTTON_TO_FILL_FORM,
+    msg: str = conversation.PRESS_BUTTON_TO_FILL_FORM,
     button_text: str = button_text.FILL_FORM,
 ) -> None:
-    keyboard = ReplyKeyboardMarkup.from_button(
-        KeyboardButton(button_text, web_app=WebAppInfo(url=url)))
-    await bot_send_data(
-        update, context,
-        message_text + warning_no_google(
-            msg=conversation.CONTINUE_FILLING_FORM, will='будут'),
-        keyboard, backwards=False, in_place=False)
+    keyboard = ReplyKeyboardMarkup.from_button(KeyboardButton(button_text, web_app=WebAppInfo(url=url)))
+    await bot_send_data(update, context, msg, keyboard, backwards=False, in_place=False)
 
 
 async def read_web_app(

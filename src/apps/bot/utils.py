@@ -3,7 +3,8 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
-from .bot_settings import button_text, cbq, constants, emoji
+from apps.google.utils import warning_no_google
+from .bot_settings import button_text, cbq, constants, conversation, emoji
 
 logger = logging.getLogger(__name__)
 
@@ -170,3 +171,8 @@ def get_values_for(what: str, data: dict) -> list | None:
         case 'mentor':
             return [data.get(key) for key in mentor_keys]
     return None
+
+
+def get_no_google_warning():
+    return conversation.PRESS_BUTTON_TO_FILL_FORM + warning_no_google(
+        conversation.CONTINUE_FILLING_FORM, will='будут')

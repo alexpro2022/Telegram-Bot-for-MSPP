@@ -9,10 +9,16 @@ from apps.bot.utils import bot_send_data
 
 logger = logging.getLogger(__name__)
 
+GOOGLE_ENV_VARS = {
+    "funds_spreadsheet_id": settings.FUNDS_SPREADSHEET_ID,
+    "mentors_spreadsheet_id": settings.MENTORS_SPREADSHEET_ID,
+    **settings.ENV_INFO,
+}
+
 
 def warning_no_google(msg: str, will: str = '') -> str:
     empty_vars = [f'{key}\n' for key, value
-                  in settings.GOOGLE_ENV_VARS.items()
+                  in GOOGLE_ENV_VARS.items()
                   if value is None or value == '_']
     if not empty_vars:
         return ''

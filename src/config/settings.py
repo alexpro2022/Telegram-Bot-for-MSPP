@@ -91,11 +91,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "ru-ru"
-
 TIME_ZONE = "Europe/Moscow"
-
 USE_I18N = True
-
 USE_TZ = True
 
 STATIC_URL = "static/"
@@ -109,7 +106,6 @@ WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
 WEBHOOK_URL = urljoin(APPLICATION_URL, "bot/")
 
 # Google
-CREDENTIALS_TYPE = env("CREDENTIALS_TYPE", default="env")
 SPREADSHEETS_URL = "https://docs.google.com/spreadsheets/d/{0}"
 FUNDS_SPREADSHEET_ID = env("FUNDS_SPREADSHEET_ID", default="_")
 MENTORS_SPREADSHEET_ID = env("MENTORS_SPREADSHEET_ID", default="_")
@@ -122,43 +118,21 @@ ENV_INFO = {
     "client_id": env("CLIENT_ID", default="_"),
     "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
 }
-GOOGLE_ENV_VARS = {
-    "funds_spreadsheet_id": FUNDS_SPREADSHEET_ID,
-    "mentors_spreadsheet_id": MENTORS_SPREADSHEET_ID,
-    **ENV_INFO,
-}
-SCOPES = ("https://www.googleapis.com/auth/spreadsheets",
-          "https://www.googleapis.com/auth/drive")
+
 TYPE = "Service_account"
 AUTH_URI = "https://accounts.google.com/o/oauth2/auth"
 TOKEN_URI = "https://oauth2.googleapis.com/token"
 AUTH_PROVIDER_X509_CERT_URL = "https://www.googleapis.com/oauth2/v1/certs"
+SCOPES = ("https://www.googleapis.com/auth/spreadsheets",
+          "https://www.googleapis.com/auth/drive")
 INFO = {
     "type": TYPE,
     "auth_uri": AUTH_URI,
     "token_uri": TOKEN_URI,
     "auth_provider_x509_cert_url": AUTH_PROVIDER_X509_CERT_URL,
-    **ENV_INFO,
     "scopes": SCOPES,
+    **ENV_INFO,
 }
-
-'''GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/d/e/{0}/formResponse"
-GOOGLE_FORM_ID = "1FAIpQLSdyfRyOfDfB3X75eEQoTOgBA8bGfe68Lthy-03EdwnnE_U9QA"
-GOOGLE_FORM_FIELDS = {
-    "surname": "50190039",
-    "first_name": "1395634080",
-    "patronymic": "864793007",
-    "age": "905514263",
-    "country": "16057190",
-    "region": "1475908288",
-    "city": "969207866",
-    "job": "1848219250",
-    "email": "894713360",
-    "phone": "1686121456",
-    "fund_name": "802736698",
-}'''
-
-EMAIL = env("EMAIL", default="example@mail.com")
 
 LOGGING_LEVEL = env("LOGGING_LEVEL", default="INFO")
 LOG_DIR = BASE_DIR / "logs"
@@ -174,5 +148,6 @@ logging.basicConfig(
 )
 
 EMOJI = env("EMOJI", default=True)
+EMAIL = env("EMAIL", default="example@mail.com")
 
 MENU_ITEMS_PER_PAGE = 5
