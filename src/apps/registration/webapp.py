@@ -22,7 +22,8 @@ async def webapp(
         KeyboardButton(button_text, web_app=WebAppInfo(url=url)))
     await bot_send_data(
         update, context,
-        message_text + warning_no_google(msg=conversation.CONTINUE_FILLING_FORM, will='будут'),
+        message_text + warning_no_google(
+            msg=conversation.CONTINUE_FILLING_FORM, will='будут'),
         keyboard, backwards=False, in_place=False)
 
 

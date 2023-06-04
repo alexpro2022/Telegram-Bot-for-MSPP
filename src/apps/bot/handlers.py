@@ -32,7 +32,10 @@ async def backwards(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def greetings(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    await bot_send_data(update, context, *menu.get_info(conversation.GREETING, cbq.GET_AGE), backwards=False)
+    await bot_send_data(
+        update, context,
+        *menu.get_info(conversation.GREETING, cbq.GET_AGE),
+        backwards=False)
     return constants.MAIN_CONVERSATION
 
 
@@ -64,7 +67,9 @@ async def get_region(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         context.user_data[constants.REGION_CURRENT_PAGE] -= 1
     elif update.callback_query.data.startswith(cbq.GO_NEXT_MENU):
         context.user_data[constants.REGION_CURRENT_PAGE] += 1
-    await bot_send_data(update, context, *await menu.get_region(context.user_data[constants.REGION_CURRENT_PAGE]))
+    await bot_send_data(
+        update, context,
+        *await menu.get_region(context.user_data[constants.REGION_CURRENT_PAGE]))
 
 
 async def get_city_or_and_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -102,20 +107,19 @@ async def no_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def get_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     url = urljoin(settings.APPLICATION_URL, reverse('new_fund', args=[
-        context.user_data.get(constants.AGE),
-    ]))
+        context.user_data.get(constants.AGE)]))
     await webapp(update, context, url)
     return constants.NEW_FUND
 
 
 async def get_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    context.user_data[constants.FUND] = parse_data(update, cbq.GET_NEW_MENTOR_FORM) or context.user_data[constants.FUND]
+    context.user_data[constants.FUND] = (
+        parse_data(update, cbq.GET_NEW_MENTOR_FORM) or context.user_data[constants.FUND])
     url = urljoin(settings.APPLICATION_URL, reverse('new_user', args=[
         context.user_data.get(constants.AGE),
         context.user_data.get(constants.REGION, ' '),
         context.user_data.get(constants.CITY, ' '),
-        context.user_data.get(constants.FUND),
-    ]))
+        context.user_data.get(constants.FUND)]))
     await webapp(update, context, url)
 
 
