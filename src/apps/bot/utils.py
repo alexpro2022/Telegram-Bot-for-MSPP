@@ -160,15 +160,13 @@ def get_values_for(what: str, data: dict) -> list:
     assert what in ('fund', 'mentor'), 'Wrong parameter "what" = {what}'
     common_keys1 = ['surname', 'name']
     common_keys2 = ['email', 'phone_number', constants.AGE]
-    common_keys3 = [constants.FUND]
-    mentor_keys = common_keys1 + ['patronimic', 'occupation'] + common_keys2 \
-        + [constants.REGION, constants.CITY] + common_keys3
-    logger.info(f'=== mentor_keys={mentor_keys}')
-    fund_keys = common_keys1 + common_keys2 + ['location'] + common_keys3
-    logger.info(f'=== fund_keys={fund_keys}')
+    mentor_keys = common_keys1 + ['patronimic', 'occupation'] + common_keys2 + [
+        constants.REGION, constants.CITY] + [constants.FUND]
+    fund_keys = common_keys1 + common_keys2 + ['location'] + [constants.FUND]
 
     match what:
         case 'fund':
             return [data.get(key) for key in fund_keys]
         case 'mentor':
             return [data.get(key) for key in mentor_keys]
+    return

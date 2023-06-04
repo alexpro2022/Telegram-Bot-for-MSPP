@@ -13,8 +13,9 @@ from telegram.ext import (
     filters,
 )
 
-from apps.registration.webapp import read_web_app, webapp
 from apps.google import services, utils
+from apps.registration.webapp import read_web_app, webapp
+
 from . import menu
 from .bot_settings import cbq, constants, conversation, emoji
 from .utils import bot_send_data, get_values_for, parse_data, reset_user_data
@@ -135,7 +136,7 @@ async def read_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYP
     back = await read_web_app(update, context)
     if back is not None:
         return await backwards(update, context)
-    await bot_send_data(
+    return await bot_send_data(
         update, context,
         *menu.get_confirmation(context.user_data), backwards=False)
 
