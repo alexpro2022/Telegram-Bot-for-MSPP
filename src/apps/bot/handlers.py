@@ -106,7 +106,7 @@ async def no_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await bot_send_data(update, context, *menu.no_fund())
 
 
-async def get_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def get_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     url = urljoin(settings.APPLICATION_URL, reverse('new_fund', args=[
         context.user_data.get(constants.AGE)]))
     await webapp(update, context, url)
@@ -124,7 +124,7 @@ async def get_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYPE
     await webapp(update, context, url)
 
 
-async def read_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def read_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await read_web_app(update, context)
     await bot_send_data(
         update, context,
@@ -145,17 +145,16 @@ async def read_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYP
 async def send_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await services.send_to_google(
         settings.FUNDS_SPREADSHEET_ID,
-        get_values_for('fund', context.user_data),
-    )
+        get_values_for('fund', context.user_data))
+    return ConversationHandler.END
 
 
 @utils.info_google
 async def send_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await services.send_to_google(
         settings.MENTORS_SPREADSHEET_ID,
-        get_values_for('mentor', context.user_data),
-    )
-
+        get_values_for('mentor', context.user_data))
+    return ConversationHandler.END
 
 HANDLERS = (
     ConversationHandler(

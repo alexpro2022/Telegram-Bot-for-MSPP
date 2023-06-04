@@ -152,7 +152,7 @@ def reset_user_data(update: Update, context: ContextTypes.DEFAULT_TYPE, step: st
                 context.user_data.pop(constants.REGION, '')
 
 
-def get_values_for(what: str, data: dict) -> list:
+def get_values_for(what: str, data: dict) -> list | None:
     """Returns a list of values to be sent to Google spreadsheet.
        Param 'what' is expected to be either 'fund' or 'mentor'.
        Raises AssertionError otherwise.
@@ -169,4 +169,4 @@ def get_values_for(what: str, data: dict) -> list:
             return [data.get(key) for key in fund_keys]
         case 'mentor':
             return [data.get(key) for key in mentor_keys]
-    return
+    return None
