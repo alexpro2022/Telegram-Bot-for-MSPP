@@ -18,7 +18,7 @@ from apps.registration.webapp import read_web_app, webapp
 
 from . import menu
 from .bot_settings import cbq, constants, conversation, emoji
-from .utils import bot_send_data, get_no_google_warning, get_values_for, parse_data, reset_user_data
+from .utils import bot_send_data, get_values_for, parse_data, reset_user_data
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +109,7 @@ async def no_fund(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def get_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     url = urljoin(settings.APPLICATION_URL, reverse('new_fund', args=[
         context.user_data.get(constants.AGE)]))
-    await webapp(update, context, url, get_no_google_warning())
+    await webapp(update, context, url, utils.get_no_google_warning())
     return constants.NEW_FUND
 
 
@@ -121,7 +121,7 @@ async def get_new_mentor_form(update: Update, context: ContextTypes.DEFAULT_TYPE
         context.user_data.get(constants.REGION, ' '),
         context.user_data.get(constants.CITY, ' '),
         context.user_data.get(constants.FUND)]))
-    await webapp(update, context, url, get_no_google_warning())
+    await webapp(update, context, url, utils.get_no_google_warning())
 
 
 async def read_new_fund_form(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

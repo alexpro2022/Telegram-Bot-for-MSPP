@@ -106,7 +106,7 @@ WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
 WEBHOOK_URL = urljoin(APPLICATION_URL, "bot/")
 
 # Google
-SPREADSHEETS_URL = "https://docs.google.com/spreadsheets/d/{0}"
+# SPREADSHEETS_URL = "https://docs.google.com/spreadsheets/d/{0}"
 FUNDS_SPREADSHEET_ID = env("FUNDS_SPREADSHEET_ID", default="_")
 MENTORS_SPREADSHEET_ID = env("MENTORS_SPREADSHEET_ID", default="_")
 

@@ -29,16 +29,16 @@ async def spreadsheet_append(
         aiogoogle: Aiogoogle,
 ) -> None:
     value_range_body = {
-        'majorDimension': 'ROWS',
+        'majorDimension': s.MAJOR_DIMENSION,
         'values': [table_values],
     }
     service = await aiogoogle.discover(s.SHEETS, s.SHEETS_VERSION)
     await aiogoogle.as_service_account(
         service.spreadsheets.values.append(
             spreadsheetId=spreadsheet_id,
-            range='A1:E30',
-            valueInputOption='USER_ENTERED',
-            insertDataOption='INSERT_ROWS',
+            range=s.RANGE,
+            valueInputOption=s.INPUT_OPTION,
+            insertDataOption=s.INSERT_OPTION,
             json=value_range_body,
         )
     )

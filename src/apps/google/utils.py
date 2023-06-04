@@ -1,30 +1,29 @@
 import logging
 
-from django.conf import settings
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 
 from apps.bot.bot_settings import conversation
 from apps.bot.utils import bot_send_data
 
-logger = logging.getLogger(__name__)
+from . import settings
 
-GOOGLE_ENV_VARS = {
-    "funds_spreadsheet_id": settings.FUNDS_SPREADSHEET_ID,
-    "mentors_spreadsheet_id": settings.MENTORS_SPREADSHEET_ID,
-    **settings.ENV_INFO,
-}
+logger = logging.getLogger(__name__)
 
 
 def warning_no_google(msg: str, will: str = '') -> str:
     empty_vars = [f'{key}\n' for key, value
-                  in GOOGLE_ENV_VARS.items()
+                  in settings.GOOGLE_ENV_VARS.items()
                   if value is None or value == '_']
     if not empty_vars:
         return ''
     return conversation.WARNING_NO_GOOGLE.format(
-        will=will,
-        empty_env_vars=''.join(empty_vars), conclusion=msg)
+        will=will, empty_env_vars=''.join(empty_vars), conclusion=msg)
+
+
+def get_no_google_warning():
+    return conversation.PRESS_BUTTON_TO_FILL_FORM + warning_no_google(
+        conversation.CONTINUE_FILLING_FORM, will='будут')
 
 
 def info_google(func):
