@@ -106,17 +106,16 @@ WEBHOOK_MODE = env.bool("WEBHOOK_MODE", default=False)
 WEBHOOK_URL = urljoin(APPLICATION_URL, "bot/")
 
 # Google
-# SPREADSHEETS_URL = "https://docs.google.com/spreadsheets/d/{0}"
-FUNDS_SPREADSHEET_ID = env("FUNDS_SPREADSHEET_ID", default="_")
-MENTORS_SPREADSHEET_ID = env("MENTORS_SPREADSHEET_ID", default="_")
-
+GOOGLE_DEFAULT_VALUE = ''
+FUNDS_SPREADSHEET_ID = env("FUNDS_SPREADSHEET_ID", default=GOOGLE_DEFAULT_VALUE)
+MENTORS_SPREADSHEET_ID = env("MENTORS_SPREADSHEET_ID", default=GOOGLE_DEFAULT_VALUE)
 ENV_INFO = {
-    "project_id": env("PROJECT_ID", default="_"),
-    "private_key_id": env("PRIVATE_KEY_ID", default="_"),
-    "private_key": env.str("PRIVATE_KEY", multiline=True, default="_"),
-    "client_email": env("CLIENT_EMAIL", default="_"),
-    "client_id": env("CLIENT_ID", default="_"),
-    "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default="_"),
+    "project_id": env("PROJECT_ID", default=GOOGLE_DEFAULT_VALUE),
+    "private_key_id": env("PRIVATE_KEY_ID", default=GOOGLE_DEFAULT_VALUE),
+    "private_key": env.str("PRIVATE_KEY", multiline=True, default=GOOGLE_DEFAULT_VALUE),
+    "client_email": env("CLIENT_EMAIL", default=GOOGLE_DEFAULT_VALUE),
+    "client_id": env("CLIENT_ID", default=GOOGLE_DEFAULT_VALUE),
+    "client_x509_cert_url": env("CLIENT_X509_CERT_URL", default=GOOGLE_DEFAULT_VALUE),
 }
 
 TYPE = "Service_account"
@@ -147,7 +146,6 @@ logging.basicConfig(
     ]
 )
 
-EMOJI = env("EMOJI", default=True)
 EMAIL = env("EMAIL", default="example@mail.com")
-
+EMOJI = env("EMOJI", default=True)
 MENU_ITEMS_PER_PAGE = 5
